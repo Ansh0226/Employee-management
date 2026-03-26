@@ -2,6 +2,7 @@ package com.ems.employee_management.service;
 
 import com.ems.employee_management.dto.SignupRequest;
 import com.ems.employee_management.dto.ChangePasswordRequest;
+import com.ems.employee_management.dto.UpdateProfileImageRequest;
 import com.ems.employee_management.entity.User;
 import com.ems.employee_management.entity.enums.Role;
 import com.ems.employee_management.entity.enums.Status;
@@ -120,5 +121,11 @@ public class UserService {
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
+    }
+
+    public User updateProfileImage(UpdateProfileImageRequest request) {
+        User user = getCurrentUser();
+        user.setProfileImage(request.getProfileImage());
+        return userRepository.save(user);
     }
 }

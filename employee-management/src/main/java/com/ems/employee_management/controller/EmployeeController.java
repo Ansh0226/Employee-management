@@ -3,6 +3,7 @@ package com.ems.employee_management.controller;
 import com.ems.employee_management.dto.ApiResponse;
 import com.ems.employee_management.dto.ChangePasswordRequest;
 import com.ems.employee_management.dto.UpdateUserRequest;
+import com.ems.employee_management.dto.UpdateProfileImageRequest;
 import com.ems.employee_management.dto.UserResponse;
 import com.ems.employee_management.entity.User;
 import com.ems.employee_management.service.EmployeeService;
@@ -143,6 +144,17 @@ public class EmployeeController {
                 .success(true)
                 .message("Password updated successfully")
                 .data("Password updated")
+                .build();
+    }
+
+    @PutMapping("/profile-image")
+    public ApiResponse<UserResponse> updateProfileImage(@RequestBody UpdateProfileImageRequest request) {
+        User updatedUser = userService.updateProfileImage(request);
+
+        return ApiResponse.<UserResponse>builder()
+                .success(true)
+                .message("Profile image updated successfully")
+                .data(employeeService.mapToDto(updatedUser))
                 .build();
     }
 
