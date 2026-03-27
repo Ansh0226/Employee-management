@@ -19,6 +19,7 @@ import java.util.List;
 public class ManagerService {
 
     private final UserRepository userRepository;
+    private final UserService userService;
 
     public Page<User> getApprovedEmployees(int page, int size) {
         List<User> users = userRepository.findAll().stream()
@@ -54,6 +55,7 @@ public class ManagerService {
     }
 
     public User updateLocation(Long id, String location) {
+        User manager = userService.getCurrentUser();
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new BadRequestException("User not found"));
 
@@ -61,8 +63,17 @@ public class ManagerService {
             throw new BadRequestException("Managers can update location for employees only");
         }
 
+        if (user.getManager() == null || !user.getManager().getId().equals(manager.getId())) {
+            throw new BadRequestException("Managers can update their own team only");
+        }
+
         user.setLocation(location);
         return userRepository.save(user);
+    }
+
+    public List<User> getMyTeam() {
+        User manager = userService.getCurrentUser();
+        return userRepository.findByManagerIdAndRole(manager.getId(), Role.EMPLOYEE);
     }
 
     private boolean matchesKeyword(User user, String keyword) {

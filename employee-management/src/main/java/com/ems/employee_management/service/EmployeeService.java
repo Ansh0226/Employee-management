@@ -149,6 +149,10 @@ public class EmployeeService {
                 .location(user.getLocation())
                 .profileImage(user.getProfileImage())
                 .age(user.getAge()) // calculated from DOB
+                .managerId(user.getManager() != null ? user.getManager().getId() : null)
+                .managerName(user.getManager() != null
+                        ? user.getManager().getFirstName() + " " + user.getManager().getLastName()
+                        : (user.getRole() != null && user.getRole().name().equals("MANAGER") ? "Admin" : null))
                 .role(user.getRole().name())
                 .status(user.getStatus().name())
                 .build();

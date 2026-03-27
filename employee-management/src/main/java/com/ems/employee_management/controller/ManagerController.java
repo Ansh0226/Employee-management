@@ -84,4 +84,17 @@ public class ManagerController {
                 .data(employeeService.mapToDto(user))
                 .build();
     }
+
+    @GetMapping("/team")
+    public ApiResponse<java.util.List<UserResponse>> getMyTeam() {
+        java.util.List<UserResponse> users = managerService.getMyTeam().stream()
+                .map(employeeService::mapToDto)
+                .toList();
+
+        return ApiResponse.<java.util.List<UserResponse>>builder()
+                .success(true)
+                .message("Manager team fetched successfully")
+                .data(users)
+                .build();
+    }
 }

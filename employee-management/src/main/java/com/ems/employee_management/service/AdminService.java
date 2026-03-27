@@ -40,6 +40,38 @@ public class AdminService {
                 .orElseThrow(() -> new BadRequestException("User not found"));
 
         user.setRole(newRole);
+
+        if (newRole != Role.EMPLOYEE) {
+            user.setManager(null);
+        }
+
         return userRepository.save(user);
+    }
+
+    public User assignEmployeeToManager(Long employeeId, Long managerId) {
+        User employee = userRepository.findById(employeeId)
+                .orElseThrow(() -> new BadRequestException("Employee not found"));
+
+        User manager = userRepository.findById(managerId)
+                .orElseThrow(() -> new BadRequestException("Manager not found"));
+
+        if (employee.getRole() != Role.EMPLOYEE) {
+            throw new BadRequestException("Selected user is not an employee");
+        }
+
+        if (manager.getRole() != Role.MANAGER) {
+            throw new BadRequestException("Selected user is not a manager");
+        }
+
+        employee.setManager(manager);
+        return userRepository.save(employee);
+    }
+
+    public List<User> getManagers() {
+        return userRepository.findByRole(Role.MANAGER);
+    }
+
+    public List<User> getManagerTeam(Long managerId) {
+        return userRepository.findByManagerIdAndRole(managerId, Role.EMPLOYEE);
     }
 }

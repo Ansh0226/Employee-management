@@ -69,6 +69,10 @@ public class User {
     @Column(columnDefinition = "TEXT")
     private String profileImage;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "manager_id")
+    private User manager;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 

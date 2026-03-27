@@ -1,6 +1,7 @@
 package com.ems.employee_management.repository;
 
 import com.ems.employee_management.entity.User;
+import com.ems.employee_management.entity.enums.Role;
 import com.ems.employee_management.entity.enums.Status;
 
 import org.springframework.data.domain.Page;
@@ -26,6 +27,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Page<User> findByAgeBetween(int minAge, int maxAge, Pageable pageable);
 
     Page<User> findByStatus(Status status, Pageable pageable);
+    List<User> findByRole(Role role);
+    List<User> findByManagerId(Long managerId);
+    List<User> findByManagerIdAndRole(Long managerId, Role role);
     // smart search
     Page<User> findByUsernameContainingIgnoreCaseOrEmailContainingIgnoreCaseOrEmployeeIdContainingIgnoreCaseOrFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrContactNumberContainingIgnoreCaseOrLocationContainingIgnoreCase(
             String username,

@@ -17,6 +17,8 @@ public class UserResponse {
     private String location;
     private String profileImage;
     private Integer age;
+    private Long managerId;
+    private String managerName;
     private String role;
     private String status;
 }

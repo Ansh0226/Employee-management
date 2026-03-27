@@ -1,11 +1,13 @@
 package com.ems.employee_management.controller;
 
 import com.ems.employee_management.dto.ApiResponse;
+import com.ems.employee_management.dto.AssignEmployeeManagerRequest;
 import com.ems.employee_management.dto.UserResponse;
 import com.ems.employee_management.entity.User;
 import com.ems.employee_management.entity.enums.Role;
 import com.ems.employee_management.service.AdminService;
 import com.ems.employee_management.service.EmployeeService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -60,6 +62,43 @@ public class AdminController {
                 .success(true)
                 .message("User role updated successfully")
                 .data(employeeService.mapToDto(user))
+                .build();
+    }
+
+    @PutMapping("/assign-manager")
+    public ApiResponse<UserResponse> assignManager(@Valid @RequestBody AssignEmployeeManagerRequest request) {
+        User user = adminService.assignEmployeeToManager(request.getEmployeeId(), request.getManagerId());
+
+        return ApiResponse.<UserResponse>builder()
+                .success(true)
+                .message("Employee assigned to manager successfully")
+                .data(employeeService.mapToDto(user))
+                .build();
+    }
+
+    @GetMapping("/managers")
+    public ApiResponse<List<UserResponse>> getManagers() {
+        List<UserResponse> users = adminService.getManagers().stream()
+                .map(employeeService::mapToDto)
+                .toList();
+
+        return ApiResponse.<List<UserResponse>>builder()
+                .success(true)
+                .message("Managers fetched successfully")
+                .data(users)
+                .build();
+    }
+
+    @GetMapping("/manager-team/{managerId}")
+    public ApiResponse<List<UserResponse>> getManagerTeam(@PathVariable Long managerId) {
+        List<UserResponse> users = adminService.getManagerTeam(managerId).stream()
+                .map(employeeService::mapToDto)
+                .toList();
+
+        return ApiResponse.<List<UserResponse>>builder()
+                .success(true)
+                .message("Manager team fetched successfully")
+                .data(users)
                 .build();
     }
 }
