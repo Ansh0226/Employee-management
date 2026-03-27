@@ -12,6 +12,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -21,36 +24,45 @@ public class ManagerService {
     private final UserRepository userRepository;
     private final UserService userService;
 
-    public Page<User> getApprovedEmployees(int page, int size) {
-        List<User> users = userRepository.findAll().stream()
-                .filter(user -> user.getStatus() == Status.APPROVED)
-                .filter(user -> user.getRole() == Role.EMPLOYEE)
-                .toList();
+    public Page<User> getApprovedEmployees(int page, int size, String sortBy, String direction) {
+        List<User> users = getApprovedEmployeesList();
+        users = sortUsers(users, sortBy, direction);
 
         return toPage(users, page, size);
     }
 
-    public Page<User> searchApproved(String keyword, int page, int size) {
+    public Page<User> searchApproved(String keyword, int page, int size, String sortBy, String direction) {
         String searchText = keyword.trim().toLowerCase();
 
-        List<User> users = userRepository.findAll().stream()
-                .filter(user -> user.getStatus() == Status.APPROVED)
-                .filter(user -> user.getRole() == Role.EMPLOYEE)
+        List<User> users = getApprovedEmployeesList().stream()
                 .filter(user -> matchesKeyword(user, searchText))
                 .toList();
 
+        users = sortUsers(users, sortBy, direction);
         return toPage(users, page, size);
     }
 
-    public Page<User> filterByLocation(String location, int page, int size) {
+    public Page<User> filterByLocation(String location, int page, int size, String sortBy, String direction) {
         String cleanLocation = location.trim();
 
-        List<User> users = userRepository.findAll().stream()
-                .filter(user -> user.getStatus() == Status.APPROVED)
-                .filter(user -> user.getRole() == Role.EMPLOYEE)
+        List<User> users = getApprovedEmployeesList().stream()
                 .filter(user -> cleanLocation.equalsIgnoreCase(user.getLocation()))
                 .toList();
 
+        users = sortUsers(users, sortBy, direction);
+        return toPage(users, page, size);
+    }
+
+    public Page<User> filterByAgeRange(int minAge, int maxAge, int page, int size, String sortBy, String direction) {
+        List<User> users = getApprovedEmployeesList().stream()
+                .filter(user -> user.getDob() != null)
+                .filter(user -> {
+                    int age = Period.between(user.getDob(), LocalDate.now()).getYears();
+                    return age >= minAge && age <= maxAge;
+                })
+                .toList();
+
+        users = sortUsers(users, sortBy, direction);
         return toPage(users, page, size);
     }
 
@@ -74,6 +86,48 @@ public class ManagerService {
     public List<User> getMyTeam() {
         User manager = userService.getCurrentUser();
         return userRepository.findByManagerIdAndRole(manager.getId(), Role.EMPLOYEE);
+    }
+
+    private List<User> getApprovedEmployeesList() {
+        return userRepository.findAll().stream()
+                .filter(user -> user.getStatus() == Status.APPROVED)
+                .filter(user -> user.getRole() == Role.EMPLOYEE)
+                .toList();
+    }
+
+    private List<User> sortUsers(List<User> users, String sortBy, String direction) {
+        Comparator<User> comparator = Comparator.comparing(
+                user -> getSortableValue(user, sortBy),
+                String.CASE_INSENSITIVE_ORDER
+        );
+
+        if ("desc".equalsIgnoreCase(direction)) {
+            comparator = comparator.reversed();
+        }
+
+        return users.stream()
+                .sorted(comparator)
+                .toList();
+    }
+
+    private String getSortableValue(User user, String sortBy) {
+        if ("employeeId".equalsIgnoreCase(sortBy)) {
+            return defaultValue(user.getEmployeeId());
+        }
+
+        if ("email".equalsIgnoreCase(sortBy)) {
+            return defaultValue(user.getEmail());
+        }
+
+        if ("location".equalsIgnoreCase(sortBy)) {
+            return defaultValue(user.getLocation());
+        }
+
+        return defaultValue(user.getFirstName());
+    }
+
+    private String defaultValue(String value) {
+        return value == null ? "" : value;
     }
 
     private boolean matchesKeyword(User user, String keyword) {

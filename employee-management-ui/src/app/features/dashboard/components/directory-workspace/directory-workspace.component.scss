@@ -150,7 +150,8 @@ select {
 }
 
 .list-shell {
-  flex: 1;
+flex: 1;
+
 }
 
 .list-item {
@@ -293,6 +294,12 @@ select {
 
 .pager {
   margin-top: 12px;
+}
+
+.page-indicator {
+  color: var(--muted);
+  font-size: 0.94rem;
+  white-space: nowrap;
 }
 
 :root[data-theme='dark'] .list-item.active {

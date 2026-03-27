@@ -39,7 +39,7 @@
         @for (manager of managers(); track manager.id) {
           <button type="button" class="list-item" [class.active]="selectedManagerId() === manager.id" (click)="chooseManager(manager.id)">
             <strong>{{ manager.firstName }} {{ manager.lastName }}</strong>
-            <small>{{ manager.employeeId }}</small>
+            <small>{{ manager.employeeId }} | {{ manager.location || 'No location' }}</small>
           </button>
         }
       </div>
@@ -70,10 +70,10 @@
           <h3>Projects</h3>
           <div class="list">
             @for (project of managerProjects(); track project.id) {
-              <article class="team-item">
+              <button type="button" class="team-item action-item" (click)="openProject(project.id)">
                 <strong>{{ project.name }}</strong>
-                <small>{{ project.status }}</small>
-              </article>
+                <small>{{ project.status }} | {{ project.managerName || 'Admin' }}</small>
+              </button>
             } @empty {
               <div class="empty-state"><p>No projects assigned.</p></div>
             }
@@ -84,10 +84,10 @@
           <h3>Team members</h3>
           <div class="list">
             @for (member of teamMembers(); track member.id) {
-              <article class="team-item">
+              <button type="button" class="team-item action-item" (click)="openTeamMember(member)">
                 <strong>{{ member.firstName }} {{ member.lastName }}</strong>
                 <small>{{ member.employeeId }} | {{ member.location || 'No location' }}</small>
-              </article>
+              </button>
             } @empty {
               <div class="empty-state"><p>No employees assigned.</p></div>
             }
@@ -96,4 +96,43 @@
       </div>
     </section>
   </div>
+}
+
+@if (selectedTeamMember(); as member) {
+  <div class="modal-backdrop" (click)="closeTeamMemberModal()">
+    <section class="modal-card small-modal" (click)="$event.stopPropagation()">
+      <div class="modal-head">
+        <div>
+          <p class="eyebrow">Employee profile</p>
+          <h2>{{ member.firstName }} {{ member.lastName }}</h2>
+        </div>
+        <button type="button" class="ghost-button" (click)="closeTeamMemberModal()">Close</button>
+      </div>
+
+      <div class="detail-grid">
+        <div><span>Employee ID</span><strong>{{ member.employeeId }}</strong></div>
+        <div><span>Email</span><strong>{{ member.email }}</strong></div>
+        <div><span>Location</span><strong>{{ member.location || 'Not set' }}</strong></div>
+        <div><span>Manager</span><strong>{{ member.managerName || 'Admin' }}</strong></div>
+      </div>
+
+      <section class="inner-card compact-card">
+        <h3>Projects</h3>
+        <div class="list">
+          @for (project of selectedTeamMemberProjects(); track project.id) {
+            <button type="button" class="team-item action-item" (click)="openProject(project.id)">
+              <strong>{{ project.name }}</strong>
+              <small>{{ project.managerName || 'Admin' }}</small>
+            </button>
+          } @empty {
+            <div class="empty-state"><p>No projects assigned.</p></div>
+          }
+        </div>
+      </section>
+    </section>
+  </div>
+}
+
+@if (selectedProject(); as project) {
+  <app-project-detail-modal [project]="project" (close)="closeProjectModal()" />
 }

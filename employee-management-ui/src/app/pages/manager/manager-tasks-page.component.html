@@ -1,12 +1,54 @@
 <app-dashboard-layout title="Manager Dashboard" [items]="menuItems" activeItem="/manager/tasks" [refreshHandler]="refresh.bind(this)">
-  <section class="page-grid">
-    <section class="card">
-      <p class="eyebrow">Create task</p>
-      <h1>Assign work</h1>
+  <section class="card task-card">
+    <div class="card-head">
+      <div>
+        <p class="eyebrow">Task list</p>
+        <h1>Manage work</h1>
+      </div>
+      <button type="button" class="primary-button" (click)="openCreateModal()">Assign work</button>
+    </div>
 
-      @if (notice()) {
-        <p class="notice" [class.error]="noticeTone() === 'error'">{{ notice() }}</p>
+    @if (notice()) {
+      <p class="notice" [class.error]="noticeTone() === 'error'">{{ notice() }}</p>
+    }
+
+    <div class="filter-row">
+      <button type="button" class="filter-button" [class.active]="taskFilter() === 'PENDING'" (click)="taskFilter.set('PENDING')">Pending</button>
+      <button type="button" class="filter-button" [class.active]="taskFilter() === 'WAITING'" (click)="taskFilter.set('WAITING')">Waiting for approvals</button>
+      <button type="button" class="filter-button" [class.active]="taskFilter() === 'COMPLETED'" (click)="taskFilter.set('COMPLETED')">Completed</button>
+    </div>
+
+    <div class="list">
+      @for (task of filteredTasks(); track task.id) {
+        <button type="button" class="approval-item task-item" (click)="openTask(task)">
+          <div>
+            <strong>{{ task.title }}</strong>
+            <small>{{ task.employeeName }} | {{ task.projectName }}</small>
+          </div>
+          <div class="task-meta">
+            <span>{{ task.status }}</span>
+            @if (task.status === 'COMPLETED') {
+              <button type="button" class="primary-button" (click)="$event.stopPropagation(); approveTask(task.id)">Approve</button>
+            }
+          </div>
+        </button>
+      } @empty {
+        <div class="empty-state"><p>No tasks available for this filter.</p></div>
       }
+    </div>
+  </section>
+</app-dashboard-layout>
+
+@if (createModalOpen()) {
+  <div class="modal-backdrop" (click)="closeCreateModal()">
+    <section class="modal-card" (click)="$event.stopPropagation()">
+      <div class="card-head">
+        <div>
+          <p class="eyebrow">Create task</p>
+          <h2>Assign work</h2>
+        </div>
+        <button type="button" class="ghost-button" (click)="closeCreateModal()">Close</button>
+      </div>
 
       <label><span>Task title</span><input [(ngModel)]="taskForm.title" /></label>
       <label><span>Description</span><textarea [(ngModel)]="taskForm.description"></textarea></label>
@@ -30,39 +72,47 @@
       </label>
       <button type="button" class="primary-button" (click)="createTask()">Create task</button>
     </section>
+  </div>
+}
 
-    <section class="card">
-      <p class="eyebrow">Task list</p>
-      <h2>All manager tasks</h2>
-      <div class="list">
-        @for (task of tasks(); track task.id) {
-          <article class="list-item">
-            <strong>{{ task.title }}</strong>
-            <small>{{ task.employeeName }} | {{ task.projectName }}</small>
-            <span>{{ task.status }}</span>
-          </article>
-        } @empty {
-          <div class="empty-state"><p>No tasks created yet.</p></div>
-        }
+@if (selectedTask(); as task) {
+  <div class="modal-backdrop" (click)="closeTaskModal()">
+    <section class="modal-card" (click)="$event.stopPropagation()">
+      <div class="card-head">
+        <div>
+          <p class="eyebrow">Task details</p>
+          <h2>{{ task.title }}</h2>
+        </div>
+        <button type="button" class="ghost-button" (click)="closeTaskModal()">Close</button>
       </div>
-    </section>
 
-    <section class="card">
-      <p class="eyebrow">Approvals</p>
-      <h2>Completed tasks</h2>
-      <div class="list">
-        @for (task of approvals(); track task.id) {
-          <article class="approval-item">
-            <div>
-              <strong>{{ task.title }}</strong>
-              <small>{{ task.employeeName }} | {{ task.projectName }}</small>
-            </div>
-            <button type="button" class="primary-button" (click)="approveTask(task.id)">Approve</button>
-          </article>
-        } @empty {
-          <div class="empty-state"><p>No completed tasks waiting for approval.</p></div>
-        }
+      <div class="task-detail-grid">
+        <div><span>Status</span><strong>{{ task.status }}</strong></div>
+        <div><span>Project</span><strong>{{ task.projectName }}</strong></div>
+        <div><span>Employee</span><strong>{{ task.employeeName }}</strong></div>
+        <div><span>Manager</span><strong>{{ task.managerName }}</strong></div>
       </div>
+
+      <section class="task-detail-card">
+        <span>Description</span>
+        <p>{{ task.description || 'No description added for this task.' }}</p>
+      </section>
+
+      @if (task.status === 'ASSIGNED') {
+        <p class="task-state-note">This task is still pending with the employee.</p>
+      }
+
+      @if (task.status === 'COMPLETED') {
+        <p class="task-state-note">The employee marked this task complete. It is waiting for your approval.</p>
+      }
+
+      @if (task.status === 'APPROVED') {
+        <p class="task-state-note">This task has been approved and is now completed.</p>
+      }
+
+      @if (task.status === 'COMPLETED') {
+        <button type="button" class="primary-button" (click)="approveTask(task.id); closeTaskModal()">Approve task</button>
+      }
     </section>
-  </section>
-</app-dashboard-layout>
+  </div>
+}

@@ -24,7 +24,7 @@ export class DashboardStoreService {
   readonly adminUsers = signal<UserRecord[]>([]);
   readonly selectedUser = signal<UserRecord | null>(null);
   readonly pageNumber = signal(0);
-  readonly pageSize = signal(12);
+  readonly pageSize = signal(5);
   readonly totalPages = signal(0);
   readonly filters = signal({
     keyword: '',
@@ -349,25 +349,25 @@ export class DashboardStoreService {
     const filters = this.filters();
     const keyword = filters.keyword.trim();
     const location = filters.location.trim();
-    const canUseAgeFilter = !this.isManager() && this.hasAgeFilter();
+    const canUseAgeFilter = this.hasAgeFilter();
 
     let endpoint = '';
 
     if (keyword) {
       endpoint = this.isManager()
-        ? `/manager/search?keyword=${encodeURIComponent(keyword)}&page=${page}&size=${size}`
+        ? `/manager/search?keyword=${encodeURIComponent(keyword)}&page=${page}&size=${size}&sortBy=${filters.sortBy}&direction=${filters.direction}`
         : `/employee/search?keyword=${encodeURIComponent(keyword)}&page=${page}&size=${size}`;
     } else if (location) {
       endpoint = this.isManager()
-        ? `/manager/filter/location?location=${encodeURIComponent(location)}&page=${page}&size=${size}`
+        ? `/manager/filter/location?location=${encodeURIComponent(location)}&page=${page}&size=${size}&sortBy=${filters.sortBy}&direction=${filters.direction}`
         : `/employee/filter/location?location=${encodeURIComponent(location)}&page=${page}&size=${size}`;
     } else if (canUseAgeFilter) {
-      endpoint =
-        `/employee/filter/age-range?minAge=${filters.minAge}&maxAge=${filters.maxAge}` +
-        `&page=${page}&size=${size}`;
+      endpoint = this.isManager()
+        ? `/manager/filter/age-range?minAge=${filters.minAge}&maxAge=${filters.maxAge}&page=${page}&size=${size}&sortBy=${filters.sortBy}&direction=${filters.direction}`
+        : `/employee/filter/age-range?minAge=${filters.minAge}&maxAge=${filters.maxAge}&page=${page}&size=${size}`;
     } else {
       endpoint = this.isManager()
-        ? `/manager/employees?page=${page}&size=${size}`
+        ? `/manager/employees?page=${page}&size=${size}&sortBy=${filters.sortBy}&direction=${filters.direction}`
         : `/employee?page=${page}&size=${size}&sortBy=${filters.sortBy}&direction=${filters.direction}`;
     }
 

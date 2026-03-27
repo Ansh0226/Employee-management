@@ -15,8 +15,7 @@ export class ManagerDashboardPageComponent {
     { label: 'Directory', route: '/manager', note: 'See approved employees in your directory.' },
     { label: 'Team', route: '/manager/team', note: 'View your assigned team.' },
     { label: 'Projects', route: '/manager/projects', note: 'See your assigned projects.' },
-    { label: 'Tasks', route: '/manager/tasks', note: 'Create tasks and approve completed work.' },
-    { label: 'Location', route: '/manager/location', note: 'Update employee location details.' }
+    { label: 'Tasks', route: '/manager/tasks', note: 'Create tasks and approve completed work.' }
   ];
 
   constructor(protected readonly store: DashboardStoreService) {

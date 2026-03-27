@@ -21,10 +21,12 @@ public class ManagerController {
     @GetMapping("/employees")
     public ApiResponse<Page<UserResponse>> getApprovedEmployees(
             @RequestParam int page,
-            @RequestParam int size) {
+            @RequestParam int size,
+            @RequestParam(defaultValue = "firstName") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction) {
 
         Page<UserResponse> users = managerService
-                .getApprovedEmployees(page, size)
+                .getApprovedEmployees(page, size, sortBy, direction)
                 .map(employeeService::mapToDto);
 
         return ApiResponse.<Page<UserResponse>>builder()
@@ -39,10 +41,12 @@ public class ManagerController {
     public ApiResponse<Page<UserResponse>> search(
             @RequestParam String keyword,
             @RequestParam int page,
-            @RequestParam int size) {
+            @RequestParam int size,
+            @RequestParam(defaultValue = "firstName") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction) {
 
         Page<UserResponse> users = managerService
-                .searchApproved(keyword, page, size)
+                .searchApproved(keyword, page, size, sortBy, direction)
                 .map(employeeService::mapToDto);
 
         return ApiResponse.<Page<UserResponse>>builder()
@@ -57,15 +61,37 @@ public class ManagerController {
     public ApiResponse<Page<UserResponse>> filterByLocation(
             @RequestParam String location,
             @RequestParam int page,
-            @RequestParam int size) {
+            @RequestParam int size,
+            @RequestParam(defaultValue = "firstName") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction) {
 
         Page<UserResponse> users = managerService
-                .filterByLocation(location, page, size)
+                .filterByLocation(location, page, size, sortBy, direction)
                 .map(employeeService::mapToDto);
 
         return ApiResponse.<Page<UserResponse>>builder()
                 .success(true)
                 .message("Filtered by location")
+                .data(users)
+                .build();
+    }
+
+    @GetMapping("/filter/age-range")
+    public ApiResponse<Page<UserResponse>> filterByAgeRange(
+            @RequestParam int minAge,
+            @RequestParam int maxAge,
+            @RequestParam int page,
+            @RequestParam int size,
+            @RequestParam(defaultValue = "firstName") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction) {
+
+        Page<UserResponse> users = managerService
+                .filterByAgeRange(minAge, maxAge, page, size, sortBy, direction)
+                .map(employeeService::mapToDto);
+
+        return ApiResponse.<Page<UserResponse>>builder()
+                .success(true)
+                .message("Filtered by age range")
                 .data(users)
                 .build();
     }

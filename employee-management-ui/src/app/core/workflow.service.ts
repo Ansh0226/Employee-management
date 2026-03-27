@@ -89,6 +89,14 @@ export class WorkflowService {
     return this.http.put<ApiResponse<TaskRecord>>(`${this.apiBase}/tasks/manager/${taskId}/approve`, {}, { headers: this.authHeaders() });
   }
 
+  updateEmployeeLocation(userId: number, location: string) {
+    return this.http.put<ApiResponse<UserRecord>>(
+      `${this.apiBase}/manager/update-location/${userId}?location=${encodeURIComponent(location)}`,
+      {},
+      { headers: this.authHeaders() }
+    );
+  }
+
   markTaskCompleted(taskId: number) {
     const payload: UpdateTaskStatusRequest = { status: 'COMPLETED' };
     return this.http.put<ApiResponse<TaskRecord>>(`${this.apiBase}/tasks/employee/${taskId}/status`, payload, { headers: this.authHeaders() });

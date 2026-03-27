@@ -5,11 +5,11 @@
 
     <div class="list">
       @for (member of team(); track member.id) {
-        <article class="list-item">
+        <button type="button" class="list-item action-item" (click)="openMember(member)">
           <strong>{{ member.firstName }} {{ member.lastName }}</strong>
           <small>{{ member.employeeId }} | {{ member.location || 'No location' }}</small>
           <span>{{ member.email }}</span>
-        </article>
+        </button>
       } @empty {
         <div class="empty-state">
           <p>No employees assigned yet.</p>
@@ -18,3 +18,55 @@
     </div>
   </section>
 </app-dashboard-layout>
+
+@if (selectedMember(); as member) {
+  <div class="modal-backdrop" (click)="closeMemberModal()">
+    <section class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-head">
+        <div>
+          <p class="eyebrow">Employee profile</p>
+          <h2>{{ member.firstName }} {{ member.lastName }}</h2>
+        </div>
+        <button type="button" class="ghost-button" (click)="closeMemberModal()">Close</button>
+      </div>
+
+      @if (notice()) {
+        <p class="notice" [class.error]="noticeTone() === 'error'">{{ notice() }}</p>
+      }
+
+      <div class="detail-grid">
+        <div><span>Employee ID</span><strong>{{ member.employeeId }}</strong></div>
+        <div><span>Email</span><strong>{{ member.email }}</strong></div>
+        <div><span>Contact</span><strong>{{ member.contactNumber }}</strong></div>
+        <div><span>Manager</span><strong>{{ member.managerName || 'Admin' }}</strong></div>
+      </div>
+
+      <section class="inner-card">
+        <h3>Projects</h3>
+        <div class="list compact-list">
+          @for (project of selectedProjects(); track project.id) {
+            <button type="button" class="project-item" (click)="openProject(project.id)">
+              <strong>{{ project.name }}</strong>
+              <small>{{ project.managerName || 'Admin' }}</small>
+            </button>
+          } @empty {
+            <div class="empty-state"><p>No projects assigned.</p></div>
+          }
+        </div>
+      </section>
+
+      <section class="inner-card compact-card">
+        <h3>Change location</h3>
+        <label>
+          <span>Location</span>
+          <input [ngModel]="locationDraft()" (ngModelChange)="locationDraft.set($event)" />
+        </label>
+        <button type="button" class="primary-button" (click)="saveLocation()" [disabled]="savingLocation()">Update location</button>
+      </section>
+    </section>
+  </div>
+}
+
+@if (selectedProject(); as project) {
+  <app-project-detail-modal [project]="project" (close)="closeProjectModal()" />
+}

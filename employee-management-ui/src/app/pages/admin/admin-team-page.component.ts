@@ -7,10 +7,11 @@ import { ProjectRecord, UserRecord } from '../../core/models';
 import { WorkflowService } from '../../core/workflow.service';
 import { DashboardLayoutComponent } from '../../features/dashboard/components/dashboard-layout/dashboard-layout.component';
 import { DashboardStoreService } from '../../features/dashboard/services/dashboard-store.service';
+import { ProjectDetailModalComponent } from '../../shared/project-detail-modal/project-detail-modal.component';
 
 @Component({
   selector: 'app-admin-team-page',
-  imports: [CommonModule, FormsModule, DashboardLayoutComponent],
+  imports: [CommonModule, FormsModule, DashboardLayoutComponent, ProjectDetailModalComponent],
   providers: [DashboardStoreService],
   templateUrl: './admin-team-page.component.html',
   styleUrl: './admin-team-page.component.scss'
@@ -22,6 +23,9 @@ export class AdminTeamPageComponent {
   protected readonly teamMembers = signal<UserRecord[]>([]);
   protected readonly managerProjects = signal<ProjectRecord[]>([]);
   protected readonly selectedManager = signal<UserRecord | null>(null);
+  protected readonly selectedTeamMember = signal<UserRecord | null>(null);
+  protected readonly selectedTeamMemberProjects = signal<ProjectRecord[]>([]);
+  protected readonly selectedProject = signal<any | null>(null);
   protected readonly selectedManagerId = signal<number | null>(null);
   protected readonly assigning = signal(false);
   protected readonly form = { employeeId: 0, managerId: 0 };
@@ -80,6 +84,32 @@ export class AdminTeamPageComponent {
 
   protected closeManagerModal(): void {
     this.selectedManager.set(null);
+  }
+
+  protected openTeamMember(member: UserRecord): void {
+    this.selectedTeamMember.set(member);
+    this.workflow.getProjectsForUser(member.id).subscribe({
+      next: (response) => {
+        this.selectedTeamMemberProjects.set(response.data ?? []);
+      }
+    });
+  }
+
+  protected closeTeamMemberModal(): void {
+    this.selectedTeamMember.set(null);
+    this.selectedTeamMemberProjects.set([]);
+  }
+
+  protected openProject(projectId: number): void {
+    this.workflow.getProjectDetail(projectId).subscribe({
+      next: (response) => {
+        this.selectedProject.set(response.data ?? null);
+      }
+    });
+  }
+
+  protected closeProjectModal(): void {
+    this.selectedProject.set(null);
   }
 
   private loadManagers(): void {

@@ -13,8 +13,7 @@ import { DashboardStoreService } from '../../features/dashboard/services/dashboa
 export class EmployeeDashboardPageComponent {
   protected readonly menuItems = [
     { label: 'Directory', route: '/employee', note: 'Browse the employee directory.' },
-    { label: 'Tasks', route: '/employee/tasks', note: 'See and complete your assigned tasks.' },
-    { label: 'Exports', route: '/employee/exports', note: 'Download the directory in Excel or PDF.' }
+    { label: 'Tasks', route: '/employee/tasks', note: 'See and complete your assigned tasks.' }
   ];
 
   constructor(protected readonly store: DashboardStoreService) {

@@ -81,6 +81,10 @@ public class ProjectService {
             return projectRepository.findByManagerId(userId);
         }
 
+        if (user.getManager() != null) {
+            return projectRepository.findByManagerId(user.getManager().getId());
+        }
+
         Map<Long, Project> projects = new LinkedHashMap<>();
         for (Task task : taskRepository.findByEmployeeId(userId)) {
             projects.put(task.getProject().getId(), task.getProject());

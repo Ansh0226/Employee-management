@@ -6,11 +6,9 @@ import { AdminDashboardPageComponent } from './pages/admin/admin-dashboard-page.
 import { AdminProjectsPageComponent } from './pages/admin/admin-projects-page.component';
 import { AdminTeamPageComponent } from './pages/admin/admin-team-page.component';
 import { EmployeeDashboardPageComponent } from './pages/employee/employee-dashboard-page.component';
-import { EmployeeExportsPageComponent } from './pages/employee/employee-exports-page.component';
 import { EmployeeTasksPageComponent } from './pages/employee/employee-tasks-page.component';
 import { LoginPageComponent } from './pages/login/login-page.component';
 import { ManagerDashboardPageComponent } from './pages/manager/manager-dashboard-page.component';
-import { ManagerLocationPageComponent } from './pages/manager/manager-location-page.component';
 import { ManagerProjectsPageComponent } from './pages/manager/manager-projects-page.component';
 import { ManagerTasksPageComponent } from './pages/manager/manager-tasks-page.component';
 import { ManagerTeamPageComponent } from './pages/manager/manager-team-page.component';
@@ -73,11 +71,6 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard('MANAGER')]
   },
   {
-    path: 'manager/location',
-    component: ManagerLocationPageComponent,
-    canActivate: [authGuard, roleGuard('MANAGER')]
-  },
-  {
     path: 'employee',
     component: EmployeeDashboardPageComponent,
     canActivate: [authGuard, roleGuard('EMPLOYEE')]
@@ -85,11 +78,6 @@ export const routes: Routes = [
   {
     path: 'employee/tasks',
     component: EmployeeTasksPageComponent,
-    canActivate: [authGuard, roleGuard('EMPLOYEE')]
-  },
-  {
-    path: 'employee/exports',
-    component: EmployeeExportsPageComponent,
     canActivate: [authGuard, roleGuard('EMPLOYEE')]
   },
   {

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 
 import { TaskRecord } from '../../core/models';
 import { WorkflowService } from '../../core/workflow.service';
@@ -14,13 +14,28 @@ import { DashboardLayoutComponent } from '../../features/dashboard/components/da
 export class EmployeeTasksPageComponent {
   private readonly workflow = inject(WorkflowService);
   protected readonly tasks = signal<TaskRecord[]>([]);
+  protected readonly taskFilter = signal<'ALL' | 'PENDING' | 'WAITING' | 'COMPLETED'>('ALL');
   protected readonly notice = signal('');
   protected readonly noticeTone = signal<'success' | 'error'>('success');
   protected readonly menuItems = [
     { label: 'Directory', route: '/employee', note: 'Browse the employee directory.' },
-    { label: 'Tasks', route: '/employee/tasks', note: 'See and complete your assigned tasks.' },
-    { label: 'Exports', route: '/employee/exports', note: 'Download the directory in Excel or PDF.' }
+    { label: 'Tasks', route: '/employee/tasks', note: 'See and complete your assigned tasks.' }
   ];
+  protected readonly filteredTasks = computed(() => {
+    if (this.taskFilter() === 'ALL') {
+      return this.tasks();
+    }
+
+    if (this.taskFilter() === 'WAITING') {
+      return this.tasks().filter((task) => task.status === 'COMPLETED');
+    }
+
+    if (this.taskFilter() === 'COMPLETED') {
+      return this.tasks().filter((task) => task.status === 'APPROVED');
+    }
+
+    return this.tasks().filter((task) => task.status === 'ASSIGNED');
+  });
 
   constructor() {
     this.refresh();

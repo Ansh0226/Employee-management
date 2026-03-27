@@ -1,5 +1,5 @@
 <app-dashboard-layout title="Employee Dashboard" [items]="menuItems" activeItem="/employee/tasks" [refreshHandler]="refresh.bind(this)">
-  <section class="card">
+  <section class="card task-card">
     <p class="eyebrow">My tasks</p>
     <h1>Assigned work</h1>
 
@@ -7,8 +7,15 @@
       <p class="notice" [class.error]="noticeTone() === 'error'">{{ notice() }}</p>
     }
 
+    <div class="filter-row">
+      <button type="button" class="filter-button" [class.active]="taskFilter() === 'ALL'" (click)="taskFilter.set('ALL')">All</button>
+      <button type="button" class="filter-button" [class.active]="taskFilter() === 'PENDING'" (click)="taskFilter.set('PENDING')">Pending</button>
+      <button type="button" class="filter-button" [class.active]="taskFilter() === 'WAITING'" (click)="taskFilter.set('WAITING')">Waiting for approval</button>
+      <button type="button" class="filter-button" [class.active]="taskFilter() === 'COMPLETED'" (click)="taskFilter.set('COMPLETED')">Completed</button>
+    </div>
+
     <div class="list">
-      @for (task of tasks(); track task.id) {
+      @for (task of filteredTasks(); track task.id) {
         <article class="task-item">
           <div class="meta">
             <strong>{{ task.title }}</strong>
@@ -24,7 +31,7 @@
         </article>
       } @empty {
         <div class="empty-state">
-          <p>No tasks assigned yet.</p>
+          <p>No tasks available for this filter.</p>
         </div>
       }
     </div>

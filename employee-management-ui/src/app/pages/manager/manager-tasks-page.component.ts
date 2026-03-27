@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { CreateTaskRequest, ProjectRecord, TaskRecord, UserRecord } from '../../core/models';
@@ -18,6 +18,9 @@ export class ManagerTasksPageComponent {
   protected readonly projects = signal<ProjectRecord[]>([]);
   protected readonly tasks = signal<TaskRecord[]>([]);
   protected readonly approvals = signal<TaskRecord[]>([]);
+  protected readonly createModalOpen = signal(false);
+  protected readonly selectedTask = signal<TaskRecord | null>(null);
+  protected readonly taskFilter = signal<'PENDING' | 'WAITING' | 'COMPLETED'>('PENDING');
   protected readonly notice = signal('');
   protected readonly noticeTone = signal<'success' | 'error'>('success');
   protected readonly taskForm: CreateTaskRequest = { title: '', description: '', projectId: 0, employeeId: 0 };
@@ -25,9 +28,19 @@ export class ManagerTasksPageComponent {
     { label: 'Directory', route: '/manager', note: 'See approved employees in your directory.' },
     { label: 'Team', route: '/manager/team', note: 'View your assigned team.' },
     { label: 'Projects', route: '/manager/projects', note: 'See your assigned projects.' },
-    { label: 'Tasks', route: '/manager/tasks', note: 'Create tasks and approve completed work.' },
-    { label: 'Location', route: '/manager/location', note: 'Update employee location details.' }
+    { label: 'Tasks', route: '/manager/tasks', note: 'Create tasks and approve completed work.' }
   ];
+  protected readonly filteredTasks = computed(() => {
+    if (this.taskFilter() === 'WAITING') {
+      return this.tasks().filter((task) => task.status === 'COMPLETED');
+    }
+
+    if (this.taskFilter() === 'COMPLETED') {
+      return this.tasks().filter((task) => task.status === 'APPROVED');
+    }
+
+    return this.tasks().filter((task) => task.status === 'ASSIGNED');
+  });
 
   constructor() {
     this.refresh();
@@ -49,6 +62,7 @@ export class ManagerTasksPageComponent {
         this.taskForm.description = '';
         this.taskForm.projectId = 0;
         this.taskForm.employeeId = 0;
+        this.createModalOpen.set(false);
         this.refresh();
       },
       error: () => {
@@ -56,6 +70,22 @@ export class ManagerTasksPageComponent {
         this.noticeTone.set('error');
       }
     });
+  }
+
+  protected openCreateModal(): void {
+    this.createModalOpen.set(true);
+  }
+
+  protected closeCreateModal(): void {
+    this.createModalOpen.set(false);
+  }
+
+  protected openTask(task: TaskRecord): void {
+    this.selectedTask.set(task);
+  }
+
+  protected closeTaskModal(): void {
+    this.selectedTask.set(null);
   }
 
   protected approveTask(taskId: number): void {
