@@ -1,0 +1,20 @@
+<app-dashboard-layout title="Manager Dashboard" [items]="menuItems" activeItem="/manager/team" [refreshHandler]="refresh.bind(this)">
+  <section class="card">
+    <p class="eyebrow">My team</p>
+    <h1>Assigned employees</h1>
+
+    <div class="list">
+      @for (member of team(); track member.id) {
+        <article class="list-item">
+          <strong>{{ member.firstName }} {{ member.lastName }}</strong>
+          <small>{{ member.employeeId }} | {{ member.location || 'No location' }}</small>
+          <span>{{ member.email }}</span>
+        </article>
+      } @empty {
+        <div class="empty-state">
+          <p>No employees assigned yet.</p>
+        </div>
+      }
+    </div>
+  </section>
+</app-dashboard-layout>

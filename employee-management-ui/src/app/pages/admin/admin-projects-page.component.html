@@ -1,0 +1,88 @@
+<app-dashboard-layout title="Admin Dashboard" [items]="menuItems" activeItem="/admin/projects" [refreshHandler]="refresh.bind(this)">
+  <section class="page-grid">
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <p class="eyebrow">Project assignment</p>
+          <h1>Project to manager</h1>
+        </div>
+        <button type="button" class="primary-button" (click)="openCreateModal()">New project</button>
+      </div>
+
+      @if (notice()) {
+        <p class="notice" [class.error]="noticeTone() === 'error'">{{ notice() }}</p>
+      }
+
+      <label>
+        <span>Project</span>
+        <select [(ngModel)]="assignForm.projectId">
+          <option [ngValue]="0">Select project</option>
+          @for (project of projects(); track project.id) {
+            <option [ngValue]="project.id">{{ project.name }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        <span>Manager</span>
+        <select [(ngModel)]="assignForm.managerId">
+          <option [ngValue]="0">Select manager</option>
+          @for (manager of managers(); track manager.id) {
+            <option [ngValue]="manager.id">{{ manager.firstName }} {{ manager.lastName }}</option>
+          }
+        </select>
+      </label>
+
+      <button type="button" class="primary-button" (click)="assignManager()">Assign project</button>
+    </section>
+
+    <section class="card">
+      <p class="eyebrow">Project list</p>
+      <h2>Current projects</h2>
+
+      <div class="list">
+        @for (project of projects(); track project.id) {
+          <button type="button" class="project-item" (click)="openProject(project.id)">
+            <strong>{{ project.name }}</strong>
+            <small>{{ project.managerName || 'No manager assigned' }}</small>
+            <p>{{ project.description || 'No description' }}</p>
+          </button>
+        } @empty {
+          <div class="empty-state">
+            <p>No projects created yet.</p>
+          </div>
+        }
+      </div>
+    </section>
+  </section>
+</app-dashboard-layout>
+
+@if (selectedProject(); as project) {
+  <app-project-detail-modal [project]="project" (close)="closeProject()" />
+}
+
+@if (createModalOpen()) {
+  <div class="modal-backdrop" (click)="closeCreateModal()">
+    <section class="modal-card" (click)="$event.stopPropagation()">
+      <div class="card-head">
+        <div>
+          <p class="eyebrow">Create project</p>
+          <h2>New project</h2>
+        </div>
+        <button type="button" class="ghost-button" (click)="closeCreateModal()">Close</button>
+      </div>
+
+      <label>
+        <span>Project name</span>
+        <input [(ngModel)]="projectForm.name" />
+      </label>
+
+      <label>
+        <span>Description</span>
+        <textarea [(ngModel)]="projectForm.description"></textarea>
+      </label>
+
+      <button type="button" class="primary-button" (click)="createProject()">Create project</button>
+    </section>
+  </div>
+}

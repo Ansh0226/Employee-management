@@ -1,0 +1,12 @@
+<app-dashboard-layout title="Admin Dashboard" [items]="menuItems" activeItem="/admin" [refreshHandler]="store.refresh.bind(store)">
+  <app-directory-workspace
+    [store]="store"
+    title="Admin directory"
+    [showRoleEditor]="true"
+    [showApprovals]="false"
+    [showAgeFilters]="true"
+    [showSortControls]="true"
+    [showExportButtons]="true"
+    [showDetailAsModal]="true"
+  />
+</app-dashboard-layout>

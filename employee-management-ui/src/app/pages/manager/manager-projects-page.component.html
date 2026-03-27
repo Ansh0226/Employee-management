@@ -1,0 +1,24 @@
+<app-dashboard-layout title="Manager Dashboard" [items]="menuItems" activeItem="/manager/projects" [refreshHandler]="refresh.bind(this)">
+  <section class="card">
+    <p class="eyebrow">My projects</p>
+    <h1>Assigned projects</h1>
+
+    <div class="list">
+      @for (project of projects(); track project.id) {
+        <button type="button" class="list-item" (click)="openProject(project.id)">
+          <strong>{{ project.name }}</strong>
+          <small>{{ project.status }}</small>
+          <span>{{ project.description || 'No description' }}</span>
+        </button>
+      } @empty {
+        <div class="empty-state">
+          <p>No projects assigned yet.</p>
+        </div>
+      }
+    </div>
+  </section>
+</app-dashboard-layout>
+
+@if (selectedProject(); as project) {
+  <app-project-detail-modal [project]="project" (close)="closeProject()" />
+}

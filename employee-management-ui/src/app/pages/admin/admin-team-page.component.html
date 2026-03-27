@@ -1,0 +1,99 @@
+<app-dashboard-layout title="Admin Dashboard" [items]="menuItems" activeItem="/admin/team" [refreshHandler]="refresh.bind(this)">
+  <section class="page-grid">
+    <section class="card">
+      <p class="eyebrow">Team assignment</p>
+      <h1>Assign employee to manager</h1>
+
+      @if (store.notice()) {
+        <p class="notice" [class.error]="store.noticeTone() === 'error'">{{ store.notice() }}</p>
+      }
+
+      <label>
+        <span>Employee</span>
+        <select [(ngModel)]="form.employeeId">
+          <option [ngValue]="0">Select employee</option>
+          @for (employee of employees(); track employee.id) {
+            <option [ngValue]="employee.id">{{ employee.firstName }} {{ employee.lastName }} | {{ employee.employeeId }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        <span>Manager</span>
+        <select [(ngModel)]="form.managerId">
+          <option [ngValue]="0">Select manager</option>
+          @for (manager of managers(); track manager.id) {
+            <option [ngValue]="manager.id">{{ manager.firstName }} {{ manager.lastName }}</option>
+          }
+        </select>
+      </label>
+
+      <button type="button" class="primary-button" (click)="assign()" [disabled]="assigning()">Assign now</button>
+    </section>
+
+    <section class="card">
+      <p class="eyebrow">Managers</p>
+      <h2>Select a manager</h2>
+
+      <div class="list">
+        @for (manager of managers(); track manager.id) {
+          <button type="button" class="list-item" [class.active]="selectedManagerId() === manager.id" (click)="chooseManager(manager.id)">
+            <strong>{{ manager.firstName }} {{ manager.lastName }}</strong>
+            <small>{{ manager.employeeId }}</small>
+          </button>
+        }
+      </div>
+    </section>
+  </section>
+</app-dashboard-layout>
+
+@if (selectedManager(); as manager) {
+  <div class="modal-backdrop" (click)="closeManagerModal()">
+    <section class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-head">
+        <div>
+          <p class="eyebrow">Manager details</p>
+          <h2>{{ manager.firstName }} {{ manager.lastName }}</h2>
+        </div>
+        <button type="button" class="ghost-button" (click)="closeManagerModal()">Close</button>
+      </div>
+
+      <div class="detail-grid">
+        <div><span>Employee ID</span><strong>{{ manager.employeeId }}</strong></div>
+        <div><span>Email</span><strong>{{ manager.email }}</strong></div>
+        <div><span>Location</span><strong>{{ manager.location || 'Not set' }}</strong></div>
+        <div><span>Role</span><strong>{{ manager.role }}</strong></div>
+      </div>
+
+      <div class="split-grid">
+        <section class="inner-card">
+          <h3>Projects</h3>
+          <div class="list">
+            @for (project of managerProjects(); track project.id) {
+              <article class="team-item">
+                <strong>{{ project.name }}</strong>
+                <small>{{ project.status }}</small>
+              </article>
+            } @empty {
+              <div class="empty-state"><p>No projects assigned.</p></div>
+            }
+          </div>
+        </section>
+
+        <section class="inner-card">
+          <h3>Team members</h3>
+          <div class="list">
+            @for (member of teamMembers(); track member.id) {
+              <article class="team-item">
+                <strong>{{ member.firstName }} {{ member.lastName }}</strong>
+                <small>{{ member.employeeId }} | {{ member.location || 'No location' }}</small>
+              </article>
+            } @empty {
+              <div class="empty-state"><p>No employees assigned.</p></div>
+            }
+          </div>
+        </section>
+      </div>
+    </section>
+  </div>
+}

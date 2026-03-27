@@ -1,0 +1,94 @@
+<div class="profile-backdrop" (click)="onClose()">
+  <section class="profile-modal" (click)="$event.stopPropagation()">
+    <div class="modal-head">
+      <div class="profile-summary">
+        @if (profile()?.profileImage) {
+          <img
+            [src]="profile()?.profileImage"
+            alt="Profile image"
+            class="profile-photo clickable"
+            (click)="previewProfileImage()"
+          />
+        } @else {
+          <div class="profile-fallback">{{ profileLabel() }}</div>
+        }
+
+        <div>
+          <h3>{{ profile()?.firstName }} {{ profile()?.lastName }}</h3>
+          <p>{{ profile()?.employeeId }} | {{ profile()?.role }}</p>
+        </div>
+      </div>
+
+      <button type="button" class="nav-button" (click)="onClose()">Close</button>
+    </div>
+
+    <div class="profile-grid">
+      <div class="profile-details">
+        <div><span>Email</span><strong>{{ profile()?.email }}</strong></div>
+        <div><span>Username</span><strong>{{ profile()?.username }}</strong></div>
+        <div><span>Contact</span><strong>{{ profile()?.contactNumber }}</strong></div>
+        <div><span>Location</span><strong>{{ profile()?.location || 'Not set' }}</strong></div>
+        <div><span>Status</span><strong>{{ profile()?.status }}</strong></div>
+        <div><span>Age</span><strong>{{ profile()?.age }}</strong></div>
+        <div><span>Manager</span><strong>{{ profile()?.managerName || 'Admin' }}</strong></div>
+      </div>
+
+      <div class="project-panel">
+        <h4>Projects</h4>
+        <div class="project-list">
+          @for (project of projects(); track project.id) {
+            <button type="button" class="project-item" (click)="openProject(project.id)">
+              <strong>{{ project.name }}</strong>
+              <small>{{ project.managerName || 'Admin' }}</small>
+            </button>
+          } @empty {
+            <div class="empty-projects">
+              <p>No projects available.</p>
+            </div>
+          }
+        </div>
+      </div>
+
+      <form #passwordNgForm="ngForm" class="password-form" (ngSubmit)="savePassword(passwordNgForm)">
+        <h4>Profile image</h4>
+        <label>
+          <span>Update picture</span>
+          <input type="file" accept="image/*" (change)="onProfileImageSelected($event)" />
+        </label>
+
+        <h4>Change password</h4>
+        <label>
+          <span>Current password</span>
+          <input [(ngModel)]="passwordForm.currentPassword" name="currentPassword" type="password" required />
+        </label>
+        <label>
+          <span>New password</span>
+          <input
+            [(ngModel)]="passwordForm.newPassword"
+            name="newPassword"
+            type="password"
+            required
+            [pattern]="passwordPattern"
+            #newPassword="ngModel"
+          />
+          @if (newPassword.invalid && newPassword.touched) {
+            <small class="field-error">Use 8 characters with uppercase, lowercase, and number.</small>
+          }
+        </label>
+        <button type="submit" class="nav-button nav-primary" [disabled]="passwordNgForm.invalid">Update password</button>
+      </form>
+    </div>
+  </section>
+</div>
+
+@if (imagePreviewVisible() && profile()?.profileImage) {
+  <app-image-preview-modal
+    [imageSrc]="profile()!.profileImage!"
+    alt="Profile preview"
+    (close)="closeImagePreview()"
+  />
+}
+
+@if (selectedProject(); as project) {
+  <app-project-detail-modal [project]="project" (close)="closeProject()" />
+}

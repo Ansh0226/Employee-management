@@ -1,0 +1,6 @@
+<div class="image-preview-backdrop" (click)="onClose()">
+  <div class="image-preview-card" (click)="$event.stopPropagation()">
+    <button type="button" class="close-button" (click)="onClose()">Close</button>
+    <img [src]="imageSrc()" [alt]="alt()" />
+  </div>
+</div>

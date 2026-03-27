@@ -1,0 +1,37 @@
+<div class="modal-backdrop" (click)="onClose()">
+  <section class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-head">
+      <div>
+        <p class="eyebrow">Project details</p>
+        <h2>{{ project().name }}</h2>
+      </div>
+      <button type="button" class="ghost-button" (click)="onClose()">Close</button>
+    </div>
+
+    <div class="detail-grid">
+      <div><span>Status</span><strong>{{ project().status }}</strong></div>
+      <div><span>Manager</span><strong>{{ project().managerName || 'Admin' }}</strong></div>
+    </div>
+
+    <section class="description-card">
+      <span>Description</span>
+      <p>{{ project().description || 'No description added for this project.' }}</p>
+    </section>
+
+    <section class="team-card">
+      <h3>Project team</h3>
+      <div class="team-list">
+        @for (member of project().teamMembers; track member.id) {
+          <article class="team-item">
+            <strong>{{ member.firstName }} {{ member.lastName }}</strong>
+            <small>{{ member.employeeId }} | {{ member.managerName || 'Admin' }}</small>
+          </article>
+        } @empty {
+          <div class="empty-state">
+            <p>No team members assigned yet.</p>
+          </div>
+        }
+      </div>
+    </section>
+  </section>
+</div>

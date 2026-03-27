@@ -1,0 +1,80 @@
+@let state = store();
+
+<section class="approvals-shell">
+  @if (state.notice()) {
+    <p class="notice" [class.error]="state.noticeTone() === 'error'">{{ state.notice() }}</p>
+  }
+
+  <section class="panel-card">
+    <div class="panel-head">
+      <div>
+        <p class="eyebrow">Pending approvals</p>
+        <h1>Admin actions</h1>
+      </div>
+    </div>
+
+    <div class="pending-list">
+      @for (user of state.pendingApprovals(); track user.id) {
+        <article class="pending-item clickable" (click)="openUserModal(user.id)">
+          <div class="meta">
+            <strong>{{ user.firstName }} {{ user.lastName }}</strong>
+            <small>{{ user.employeeId }} | {{ user.email }}</small>
+          </div>
+          <span class="hint">Open</span>
+        </article>
+      } @empty {
+        <div class="empty-state">
+          <h3>No pending approvals</h3>
+          <p>Every registered user is already approved.</p>
+        </div>
+      }
+    </div>
+  </section>
+</section>
+
+@if (selectedUser(); as user) {
+  <div class="modal-backdrop" (click)="closeUserModal()">
+    <section class="modal-card" (click)="$event.stopPropagation()">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">Approval details</p>
+          <h2>{{ user.firstName }} {{ user.lastName }}</h2>
+        </div>
+        <button type="button" class="ghost-button" (click)="closeUserModal()">Close</button>
+      </div>
+
+      <div class="detail-grid">
+        <div><span>Employee ID</span><strong>{{ user.employeeId }}</strong></div>
+        <div><span>Email</span><strong>{{ user.email }}</strong></div>
+        <div><span>Username</span><strong>{{ user.username }}</strong></div>
+        <div><span>Contact</span><strong>{{ user.contactNumber }}</strong></div>
+        <div><span>Location</span><strong>{{ user.location || 'Not set' }}</strong></div>
+        <div><span>Age</span><strong>{{ user.age }}</strong></div>
+      </div>
+
+      <div class="form-grid">
+        <label>
+          <span>Role</span>
+          <select [ngModel]="roleDraft()" (ngModelChange)="roleDraft.set($event)">
+            <option value="EMPLOYEE">EMPLOYEE</option>
+            <option value="MANAGER">MANAGER</option>
+          </select>
+        </label>
+
+        @if (roleDraft() === 'EMPLOYEE') {
+          <label>
+            <span>Manager</span>
+            <select [ngModel]="managerDraft()" (ngModelChange)="managerDraft.set($event)">
+              <option [ngValue]="null">Select manager</option>
+              @for (manager of state.managerUsers(); track manager.id) {
+                <option [ngValue]="manager.id">{{ manager.firstName }} {{ manager.lastName }}</option>
+              }
+            </select>
+          </label>
+        }
+      </div>
+
+      <button type="button" class="primary-button" (click)="approveSelectedUser()" [disabled]="state.adminBusy()">Approve user</button>
+    </section>
+  </div>
+}

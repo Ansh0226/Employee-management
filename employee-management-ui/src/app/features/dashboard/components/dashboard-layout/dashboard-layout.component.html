@@ -1,0 +1,8 @@
+<app-navbar [showRefresh]="true" (refresh)="onRefresh()" />
+
+<main class="layout-shell">
+  <app-dashboard-sidebar [title]="title()" [items]="items()" [activeItem]="activeItem()" />
+  <section class="layout-content">
+    <ng-content />
+  </section>
+</main>

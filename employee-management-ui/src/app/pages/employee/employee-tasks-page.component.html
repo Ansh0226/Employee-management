@@ -1,0 +1,32 @@
+<app-dashboard-layout title="Employee Dashboard" [items]="menuItems" activeItem="/employee/tasks" [refreshHandler]="refresh.bind(this)">
+  <section class="card">
+    <p class="eyebrow">My tasks</p>
+    <h1>Assigned work</h1>
+
+    @if (notice()) {
+      <p class="notice" [class.error]="noticeTone() === 'error'">{{ notice() }}</p>
+    }
+
+    <div class="list">
+      @for (task of tasks(); track task.id) {
+        <article class="task-item">
+          <div class="meta">
+            <strong>{{ task.title }}</strong>
+            <small>{{ task.projectName }} | {{ task.status }}</small>
+            <span>{{ task.description || 'No description' }}</span>
+          </div>
+
+          @if (task.status === 'ASSIGNED') {
+            <button type="button" class="primary-button" (click)="completeTask(task.id)">Mark completed</button>
+          } @else {
+            <span class="badge">{{ task.status }}</span>
+          }
+        </article>
+      } @empty {
+        <div class="empty-state">
+          <p>No tasks assigned yet.</p>
+        </div>
+      }
+    </div>
+  </section>
+</app-dashboard-layout>

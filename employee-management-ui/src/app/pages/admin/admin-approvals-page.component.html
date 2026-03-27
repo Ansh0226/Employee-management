@@ -1,0 +1,3 @@
+<app-dashboard-layout title="Admin Dashboard" [items]="menuItems" activeItem="/admin/approvals" [refreshHandler]="store.refresh.bind(store)">
+  <app-pending-approvals-panel [store]="store" />
+</app-dashboard-layout>

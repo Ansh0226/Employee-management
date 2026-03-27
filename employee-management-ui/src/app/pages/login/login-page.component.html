@@ -1,0 +1,67 @@
+<app-navbar activePage="login" />
+
+<main class="auth-shell">
+  <section class="auth-grid">
+    <section class="hero-panel">
+      <div class="hero-overlay">
+        <p class="eyebrow">Employee Management System</p>
+        <h1>Work, approvals, and people data in one place.</h1>
+        <p class="lede">
+          Choose your role, sign in, and the app will take you directly to the right dashboard.
+        </p>
+      </div>
+    </section>
+
+    <section class="auth-card">
+      <div>
+        <p class="eyebrow">Login</p>
+        <h2>Sign in to continue</h2>
+      </div>
+
+      @if (notice()) {
+        <p class="notice" [class.success]="noticeTone() === 'success'" [class.error]="noticeTone() === 'error'">
+          {{ notice() }}
+        </p>
+      }
+
+      <form #loginNgForm="ngForm" class="auth-form" (ngSubmit)="login(loginNgForm)">
+        <label>
+          <span>Role</span>
+          <select [(ngModel)]="loginForm.role" name="role" required #role="ngModel">
+            @for (item of roles; track item) {
+              <option [ngValue]="item">{{ item }}</option>
+            }
+          </select>
+          @if ((role.invalid && role.touched) || (role.invalid && submitted())) {
+            <small class="field-error">Please choose your role.</small>
+          }
+        </label>
+
+        <label>
+          <span>Username, email, or employee id</span>
+          <input [(ngModel)]="loginForm.identifier" name="identifier" required #identifier="ngModel" />
+          @if ((identifier.invalid && identifier.touched) || (identifier.invalid && submitted())) {
+            <small class="field-error">Identifier is required.</small>
+          }
+        </label>
+
+        <label>
+          <span>Password</span>
+          <input [(ngModel)]="loginForm.password" name="password" type="password" required minlength="8" #password="ngModel" />
+          @if ((password.invalid && password.touched) || (password.invalid && submitted())) {
+            <small class="field-error">Password is required.</small>
+          }
+        </label>
+
+        <button type="submit" class="primary-button" [disabled]="busy() || loginNgForm.invalid">
+          {{ busy() ? 'Signing in...' : 'Login' }}
+        </button>
+      </form>
+
+      <p class="helper-row">
+        New user?
+        <a href="/register">Register</a>
+      </p>
+    </section>
+  </section>
+</main>

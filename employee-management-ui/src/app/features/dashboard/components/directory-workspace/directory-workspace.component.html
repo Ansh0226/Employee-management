@@ -1,0 +1,317 @@
+@let state = store();
+
+<main class="workspace-shell">
+  @if (state.notice()) {
+    <section class="notice-strip">
+      <p class="notice" [class.error]="state.noticeTone() === 'error'">
+        {{ state.notice() }}
+      </p>
+    </section>
+  }
+
+  <section class="workspace-grid" [class.single-column]="!showApprovals()" [class.list-only]="showDetailAsModal() && !showApprovals()">
+    <section class="directory-panel">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">{{ title() }}</p>
+          <h1>Directory</h1>
+        </div>
+
+        @if (showExportButtons()) {
+          <div class="action-row">
+            <button type="button" class="ghost-button" (click)="state.exportDirectory('excel')" [disabled]="state.exportBusy()">Export Excel</button>
+            <button type="button" class="ghost-button" (click)="state.exportDirectory('pdf')" [disabled]="state.exportBusy()">Export PDF</button>
+          </div>
+        }
+      </div>
+
+      <form class="filters-grid" (ngSubmit)="state.applyFilters()">
+        <input
+          [ngModel]="state.filters().keyword"
+          (ngModelChange)="state.updateFilter('keyword', $event)"
+          name="keyword"
+          placeholder="Search name, username, email, employee id"
+        />
+        <input
+          [ngModel]="state.filters().location"
+          (ngModelChange)="state.updateFilter('location', $event)"
+          name="location"
+          placeholder="Filter by location"
+        />
+
+        @if (showSortControls()) {
+          <select
+            [ngModel]="state.filters().sortBy"
+            (ngModelChange)="state.updateFilter('sortBy', $event)"
+            name="sortBy"
+          >
+            <option value="firstName">Sort by name</option>
+            <option value="employeeId">Sort by employee id</option>
+            <option value="email">Sort by email</option>
+            <option value="location">Sort by location</option>
+          </select>
+
+          <select
+            [ngModel]="state.filters().direction"
+            (ngModelChange)="state.updateFilter('direction', $event)"
+            name="direction"
+          >
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+          </select>
+        }
+
+        @if (showAgeFilters()) {
+          <input
+            [ngModel]="state.filters().minAge"
+            (ngModelChange)="state.updateFilter('minAge', $event)"
+            name="minAge"
+            type="number"
+            placeholder="Min age"
+          />
+          <input
+            [ngModel]="state.filters().maxAge"
+            (ngModelChange)="state.updateFilter('maxAge', $event)"
+            name="maxAge"
+            type="number"
+            placeholder="Max age"
+          />
+        }
+
+        <div class="action-row">
+          <button type="submit" class="primary-button" [disabled]="state.directoryBusy()">Apply</button>
+          <button type="button" class="ghost-button" (click)="state.resetFilters()" [disabled]="state.directoryBusy()">Reset</button>
+        </div>
+      </form>
+
+      <div class="list-shell">
+        @for (user of state.visibleUsers(); track user.id) {
+          <button type="button" class="list-item" [class.active]="state.isSelected(user)" (click)="state.chooseUser(user)">
+            <span>{{ user.firstName }} {{ user.lastName }}</span>
+            <small>{{ user.employeeId }}</small>
+          </button>
+        } @empty {
+          <div class="empty-state">
+            <h3>No employees found</h3>
+            <p>Try changing the search or filters.</p>
+          </div>
+        }
+      </div>
+
+      <div class="pager">
+        <button type="button" class="ghost-button" (click)="state.goToPreviousPage()" [disabled]="state.pageNumber() === 0 || state.directoryBusy()">Previous</button>
+        <button type="button" class="ghost-button" (click)="state.goToNextPage()" [disabled]="state.pageNumber() + 1 >= state.totalPages() || state.directoryBusy()">Next</button>
+      </div>
+    </section>
+
+    @if (!showDetailAsModal()) {
+      <section class="detail-panel">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">Employee details</p>
+            <h2>{{ state.selectedUser()?.firstName }} {{ state.selectedUser()?.lastName }}</h2>
+          </div>
+        </div>
+
+        @if (state.selectedUser(); as user) {
+          <div class="detail-card">
+            <div class="detail-hero">
+              @if (user.profileImage) {
+                <img [src]="user.profileImage" alt="Profile picture" class="detail-photo" (click)="openImagePreview()" />
+              } @else {
+                <div class="detail-fallback">{{ state.selectedUserLabel() }}</div>
+              }
+            </div>
+
+            <div class="detail-grid">
+              <div><span>Name</span><strong>{{ user.firstName }} {{ user.lastName }}</strong></div>
+              <div><span>Employee ID</span><strong>{{ user.employeeId }}</strong></div>
+              <div><span>Username</span><strong>{{ user.username }}</strong></div>
+              <div><span>Email</span><strong>{{ user.email }}</strong></div>
+              <div><span>Contact</span><strong>{{ user.contactNumber }}</strong></div>
+              <div><span>Age</span><strong>{{ user.age }}</strong></div>
+              <div><span>Location</span><strong>{{ user.location || 'Not set' }}</strong></div>
+              <div><span>Status</span><strong>{{ user.status }}</strong></div>
+              <div><span>Role</span><strong>{{ user.role }}</strong></div>
+              <div><span>Manager</span><strong>{{ user.managerName || 'Not assigned' }}</strong></div>
+            </div>
+
+            <section class="project-section">
+              <h3>Projects</h3>
+              <div class="project-list">
+                @for (project of selectedProjects(); track project.id) {
+                  <button type="button" class="project-chip" (click)="openProject(project.id)">
+                    <strong>{{ project.name }}</strong>
+                    <small>{{ project.managerName || 'Admin' }}</small>
+                  </button>
+                } @empty {
+                  <div class="empty-state compact">
+                    <p>No projects available.</p>
+                  </div>
+                }
+              </div>
+            </section>
+
+            @if (showLocationEditor()) {
+              <div class="edit-card">
+                <h3>Change location</h3>
+                <input
+                  [ngModel]="state.locationDrafts()[user.id]"
+                  (ngModelChange)="state.updateLocationDraft(user.id, $event)"
+                  [ngModelOptions]="{ standalone: true }"
+                  placeholder="Enter new location"
+                />
+                <button type="button" class="primary-button" (click)="state.saveManagerLocation()" [disabled]="state.directoryBusy()">Update location</button>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="empty-state">
+            <h3>No employee selected</h3>
+            <p>Select an employee from the directory list.</p>
+          </div>
+        }
+      </section>
+    }
+
+    @if (showApprovals()) {
+      <section class="pending-panel">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">Pending approvals</p>
+            <h3>Waiting for admin action</h3>
+          </div>
+        </div>
+
+        <div class="pending-list">
+          @for (user of state.pendingApprovals(); track user.id) {
+            <article class="pending-item">
+              <div>
+                <strong>{{ user.firstName }} {{ user.lastName }}</strong>
+                <small>{{ user.employeeId }}</small>
+              </div>
+              <button type="button" class="primary-button" (click)="state.approveUser(user.id)" [disabled]="state.adminBusy()">Approve</button>
+            </article>
+          } @empty {
+            <div class="empty-state compact">
+              <p>No pending approvals right now.</p>
+            </div>
+          }
+        </div>
+      </section>
+    }
+  </section>
+</main>
+
+@if (showDetailAsModal() && state.selectedUser(); as user) {
+  <div class="detail-modal-backdrop" (click)="closeDetailModal()">
+    <section class="detail-modal-card" (click)="$event.stopPropagation()">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">Employee details</p>
+          <h2>{{ user.firstName }} {{ user.lastName }}</h2>
+        </div>
+        <button type="button" class="ghost-button" (click)="closeDetailModal()">Close</button>
+      </div>
+
+      <div class="detail-card modal-card">
+        <div class="detail-hero">
+          @if (user.profileImage) {
+            <img [src]="user.profileImage" alt="Profile picture" class="detail-photo" (click)="openImagePreview()" />
+          } @else {
+            <div class="detail-fallback">{{ state.selectedUserLabel() }}</div>
+          }
+        </div>
+
+        <div class="detail-grid">
+          <div><span>Name</span><strong>{{ user.firstName }} {{ user.lastName }}</strong></div>
+          <div><span>Employee ID</span><strong>{{ user.employeeId }}</strong></div>
+          <div><span>Username</span><strong>{{ user.username }}</strong></div>
+          <div><span>Email</span><strong>{{ user.email }}</strong></div>
+          <div><span>Contact</span><strong>{{ user.contactNumber }}</strong></div>
+          <div><span>Age</span><strong>{{ user.age }}</strong></div>
+          <div><span>Location</span><strong>{{ user.location || 'Not set' }}</strong></div>
+          <div><span>Status</span><strong>{{ user.status }}</strong></div>
+          <div><span>Role</span><strong>{{ user.role }}</strong></div>
+          <div><span>Manager</span><strong>{{ user.managerName || 'Not assigned' }}</strong></div>
+        </div>
+
+        <section class="project-section">
+          <h3>Projects</h3>
+          <div class="project-list">
+            @for (project of selectedProjects(); track project.id) {
+              <button type="button" class="project-chip" (click)="openProject(project.id)">
+                <strong>{{ project.name }}</strong>
+                <small>{{ project.managerName || 'Admin' }}</small>
+              </button>
+            } @empty {
+              <div class="empty-state compact">
+                <p>No projects available.</p>
+              </div>
+            }
+          </div>
+        </section>
+
+        @if (showRoleEditor()) {
+          <div class="edit-grid">
+            <div class="edit-card">
+              <h3>Change role</h3>
+              <select
+                [ngModel]="state.roleDrafts()[user.id]"
+                (ngModelChange)="state.updateRoleDraft(user.id, $event)"
+                [ngModelOptions]="{ standalone: true }"
+              >
+                @for (role of roles; track role) {
+                  <option [ngValue]="role">{{ role }}</option>
+                }
+              </select>
+            </div>
+
+            @if (state.roleDrafts()[user.id] === 'EMPLOYEE') {
+              <div class="edit-card">
+                <h3>Assign manager</h3>
+                <select
+                  [ngModel]="state.managerDrafts()[user.id]"
+                  (ngModelChange)="state.updateManagerDraft(user.id, $event)"
+                  [ngModelOptions]="{ standalone: true }"
+                >
+                  <option [ngValue]="null">Select manager</option>
+                  @for (manager of state.managerUsers(); track manager.id) {
+                    <option [ngValue]="manager.id">{{ manager.firstName }} {{ manager.lastName }}</option>
+                  }
+                </select>
+              </div>
+            }
+          </div>
+
+          <button type="button" class="primary-button" (click)="state.saveAdminUser()" [disabled]="state.adminBusy()">Save user</button>
+        }
+
+        @if (showLocationEditor()) {
+          <div class="edit-card">
+            <h3>Change location</h3>
+            <input
+              [ngModel]="state.locationDrafts()[user.id]"
+              (ngModelChange)="state.updateLocationDraft(user.id, $event)"
+              [ngModelOptions]="{ standalone: true }"
+              placeholder="Enter new location"
+            />
+            <button type="button" class="primary-button" (click)="state.saveManagerLocation()" [disabled]="state.directoryBusy()">Update location</button>
+          </div>
+        }
+      </div>
+    </section>
+  </div>
+}
+
+@if (imagePreviewOpen() && state.selectedUser()?.profileImage) {
+  <app-image-preview-modal
+    [imageSrc]="state.selectedUser()!.profileImage!"
+    alt="Employee profile preview"
+    (close)="closeImagePreview()"
+  />
+}
+
+@if (selectedProjectDetail(); as project) {
+  <app-project-detail-modal [project]="project" (close)="closeProjectModal()" />
+}

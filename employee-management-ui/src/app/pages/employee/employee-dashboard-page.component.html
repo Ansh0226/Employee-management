@@ -1,0 +1,13 @@
+<app-dashboard-layout title="Employee Dashboard" [items]="menuItems" activeItem="/employee" [refreshHandler]="store.refresh.bind(store)">
+  <app-directory-workspace
+    [store]="store"
+    title="Employee directory"
+    [showRoleEditor]="false"
+    [showLocationEditor]="false"
+    [showApprovals]="false"
+    [showAgeFilters]="true"
+    [showSortControls]="true"
+    [showExportButtons]="false"
+    [showDetailAsModal]="true"
+  />
+</app-dashboard-layout>

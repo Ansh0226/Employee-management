@@ -1,0 +1,13 @@
+<app-dashboard-layout title="Manager Dashboard" [items]="menuItems" activeItem="/manager" [refreshHandler]="store.refresh.bind(store)">
+  <app-directory-workspace
+    [store]="store"
+    title="Manager directory"
+    [showRoleEditor]="false"
+    [showLocationEditor]="false"
+    [showApprovals]="false"
+    [showAgeFilters]="false"
+    [showSortControls]="false"
+    [showExportButtons]="true"
+    [showDetailAsModal]="true"
+  />
+</app-dashboard-layout>

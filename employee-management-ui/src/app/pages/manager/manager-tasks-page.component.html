@@ -1,0 +1,68 @@
+<app-dashboard-layout title="Manager Dashboard" [items]="menuItems" activeItem="/manager/tasks" [refreshHandler]="refresh.bind(this)">
+  <section class="page-grid">
+    <section class="card">
+      <p class="eyebrow">Create task</p>
+      <h1>Assign work</h1>
+
+      @if (notice()) {
+        <p class="notice" [class.error]="noticeTone() === 'error'">{{ notice() }}</p>
+      }
+
+      <label><span>Task title</span><input [(ngModel)]="taskForm.title" /></label>
+      <label><span>Description</span><textarea [(ngModel)]="taskForm.description"></textarea></label>
+      <label>
+        <span>Project</span>
+        <select [(ngModel)]="taskForm.projectId">
+          <option [ngValue]="0">Select project</option>
+          @for (project of projects(); track project.id) {
+            <option [ngValue]="project.id">{{ project.name }}</option>
+          }
+        </select>
+      </label>
+      <label>
+        <span>Employee</span>
+        <select [(ngModel)]="taskForm.employeeId">
+          <option [ngValue]="0">Select employee</option>
+          @for (member of team(); track member.id) {
+            <option [ngValue]="member.id">{{ member.firstName }} {{ member.lastName }}</option>
+          }
+        </select>
+      </label>
+      <button type="button" class="primary-button" (click)="createTask()">Create task</button>
+    </section>
+
+    <section class="card">
+      <p class="eyebrow">Task list</p>
+      <h2>All manager tasks</h2>
+      <div class="list">
+        @for (task of tasks(); track task.id) {
+          <article class="list-item">
+            <strong>{{ task.title }}</strong>
+            <small>{{ task.employeeName }} | {{ task.projectName }}</small>
+            <span>{{ task.status }}</span>
+          </article>
+        } @empty {
+          <div class="empty-state"><p>No tasks created yet.</p></div>
+        }
+      </div>
+    </section>
+
+    <section class="card">
+      <p class="eyebrow">Approvals</p>
+      <h2>Completed tasks</h2>
+      <div class="list">
+        @for (task of approvals(); track task.id) {
+          <article class="approval-item">
+            <div>
+              <strong>{{ task.title }}</strong>
+              <small>{{ task.employeeName }} | {{ task.projectName }}</small>
+            </div>
+            <button type="button" class="primary-button" (click)="approveTask(task.id)">Approve</button>
+          </article>
+        } @empty {
+          <div class="empty-state"><p>No completed tasks waiting for approval.</p></div>
+        }
+      </div>
+    </section>
+  </section>
+</app-dashboard-layout>

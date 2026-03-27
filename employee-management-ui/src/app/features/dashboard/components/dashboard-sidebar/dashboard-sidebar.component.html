@@ -1,0 +1,17 @@
+<aside class="sidebar-card">
+  <p class="eyebrow">{{ title() }}</p>
+  <h2>Workspace</h2>
+
+  <nav class="sidebar-nav">
+    @for (item of items(); track item.route) {
+      <a
+        [routerLink]="item.route"
+        class="sidebar-link"
+        [class.active]="activeItem() === item.route"
+      >
+        <strong>{{ item.label }}</strong>
+        <small>{{ item.note }}</small>
+      </a>
+    }
+  </nav>
+</aside>

@@ -1,0 +1,95 @@
+<app-navbar activePage="register" />
+
+<main class="register-shell">
+  <section class="register-grid">
+    <section class="register-copy">
+      <p class="eyebrow">New account</p>
+      <h1>Create your employee portal profile.</h1>
+      <p class="lede">
+        Fill the valid details below. Your account will be created as an employee and will need admin approval before login.
+      </p>
+    </section>
+
+    <section class="register-card">
+      <div>
+        <p class="eyebrow">Signup</p>
+        <h2>Register</h2>
+      </div>
+
+      @if (notice()) {
+        <p class="notice" [class.success]="noticeTone() === 'success'" [class.error]="noticeTone() === 'error'">
+          {{ notice() }}
+        </p>
+      }
+
+      <form #registerNgForm="ngForm" class="register-form" (ngSubmit)="register(registerNgForm)">
+        <label>
+          <span>Username</span>
+          <input [(ngModel)]="signupForm.username" name="username" required [pattern]="usernamePattern" #username="ngModel" />
+          @if ((username.invalid && username.touched) || (username.invalid && submitted())) {
+            <small class="field-error">Use 3-20 lowercase letters, numbers, dot or underscore.</small>
+          }
+        </label>
+
+        <label>
+          <span>First name</span>
+          <input [(ngModel)]="signupForm.firstName" name="firstName" required #firstName="ngModel" />
+          @if ((firstName.invalid && firstName.touched) || (firstName.invalid && submitted())) {
+            <small class="field-error">First name is required.</small>
+          }
+        </label>
+
+        <label>
+          <span>Last name</span>
+          <input [(ngModel)]="signupForm.lastName" name="lastName" />
+        </label>
+
+        <label>
+          <span>Email</span>
+          <input [(ngModel)]="signupForm.email" name="email" required email #email="ngModel" />
+          @if ((email.invalid && email.touched) || (email.invalid && submitted())) {
+            <small class="field-error">Enter a valid email address.</small>
+          }
+        </label>
+
+        <label>
+          <span>Password</span>
+          <input [(ngModel)]="signupForm.password" name="password" type="password" required [pattern]="passwordPattern" #password="ngModel" />
+          @if ((password.invalid && password.touched) || (password.invalid && submitted())) {
+            <small class="field-error">Password needs 8 characters, 1 uppercase, 1 lowercase, and 1 number.</small>
+          }
+        </label>
+
+        <label>
+          <span>Date of birth</span>
+          <input [(ngModel)]="signupForm.dob" name="dob" type="date" required #dob="ngModel" />
+          @if ((dob.invalid && dob.touched) || (dob.invalid && submitted())) {
+            <small class="field-error">Date of birth is required.</small>
+          }
+        </label>
+
+        <label>
+          <span>Contact number</span>
+          <input [(ngModel)]="signupForm.contactNumber" name="contactNumber" required [pattern]="contactPattern" #contactNumber="ngModel" />
+          @if ((contactNumber.invalid && contactNumber.touched) || (contactNumber.invalid && submitted())) {
+            <small class="field-error">Phone must start with 6-9 and contain exactly 10 digits.</small>
+          }
+        </label>
+
+        <label>
+          <span>Location</span>
+          <input [(ngModel)]="signupForm.location" name="location" />
+        </label>
+
+        <label>
+          <span>Profile picture</span>
+          <input type="file" accept="image/*" (change)="onFileSelected($event)" />
+        </label>
+
+        <button type="submit" class="primary-button" [disabled]="busy() || registerNgForm.invalid">
+          {{ busy() ? 'Creating account...' : 'Register' }}
+        </button>
+      </form>
+    </section>
+  </section>
+</main>

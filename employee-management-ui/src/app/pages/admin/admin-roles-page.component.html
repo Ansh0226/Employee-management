@@ -1,0 +1,11 @@
+<app-dashboard-layout title="Admin Dashboard" [items]="menuItems" activeItem="/admin/roles" [refreshHandler]="store.refresh.bind(store)">
+  <app-directory-workspace
+    [store]="store"
+    title="Role management"
+    [showRoleEditor]="true"
+    [showApprovals]="false"
+    [showAgeFilters]="true"
+    [showSortControls]="true"
+    [showExportButtons]="false"
+  />
+</app-dashboard-layout>

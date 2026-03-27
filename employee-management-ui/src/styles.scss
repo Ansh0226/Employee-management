@@ -1,0 +1,48 @@
+html, body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: "Segoe UI", "Trebuchet MS", sans-serif;
+  background: var(--page-bg);
+  color: var(--text);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --accent: #ea580c;
+  --accent-soft: #fff7ed;
+  --page-bg:
+    radial-gradient(circle at top left, rgba(251, 191, 36, 0.22), transparent 28%),
+    radial-gradient(circle at top right, rgba(234, 88, 12, 0.18), transparent 30%),
+    linear-gradient(180deg, #fff7ed 0%, #f8fafc 54%, #eef2ff 100%);
+  --panel: rgba(255, 255, 255, 0.92);
+  --card: #ffffff;
+  --border: rgba(15, 23, 42, 0.1);
+  --text: #0f172a;
+  --muted: #475569;
+  --success-bg: #ecfdf5;
+  --success-text: #047857;
+  --error-bg: #fef2f2;
+  --error-text: #b91c1c;
+}
+
+:root[data-theme='dark'] {
+  --page-bg:
+    radial-gradient(circle at top left, rgba(249, 115, 22, 0.18), transparent 24%),
+    radial-gradient(circle at top right, rgba(56, 189, 248, 0.14), transparent 28%),
+    linear-gradient(180deg, #0f172a 0%, #111827 48%, #020617 100%);
+  --panel: rgba(15, 23, 42, 0.92);
+  --card: rgba(15, 23, 42, 0.88);
+  --border: rgba(148, 163, 184, 0.18);
+  --text: #e5eefb;
+  --muted: #a8b7cf;
+  --success-bg: rgba(4, 120, 87, 0.18);
+  --success-text: #6ee7b7;
+  --error-bg: rgba(185, 28, 28, 0.2);
+  --error-text: #fda4af;
+}
