@@ -55,24 +55,26 @@
               name="keyword"
               placeholder="Search name, username, email, employee id"
             />
-            <input
-              [ngModel]="state.filters().location"
-              (ngModelChange)="state.updateFilter('location', $event)"
-              name="location"
-              placeholder="Filter by location"
-            />
+        <select
+          [ngModel]="state.filters().location"
+          (ngModelChange)="state.updateFilter('location', $event)"
+          name="location"
+        >
+          <option value="">All locations</option>
+          @for (location of state.locationOptions(); track location) {
+            <option [value]="location">{{ location }}</option>
+          }
+        </select>
 
             @if (showSortControls()) {
               <select
                 [ngModel]="state.filters().sortBy"
                 (ngModelChange)="state.updateFilter('sortBy', $event)"
                 name="sortBy"
-              >
-                <option value="firstName">Sort by name</option>
-                <option value="employeeId">Sort by employee id</option>
-                <option value="email">Sort by email</option>
-                <option value="location">Sort by location</option>
-              </select>
+          >
+            <option value="firstName">Sort by name</option>
+            <option value="employeeId">Sort by employee id</option>
+          </select>
 
               <select
                 [ngModel]="state.filters().direction"

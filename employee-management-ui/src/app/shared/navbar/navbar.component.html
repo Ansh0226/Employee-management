@@ -26,7 +26,7 @@
       <button type="button" class="nav-button nav-primary" (click)="logout()">Logout</button>
     } @else {
       <a routerLink="/login" class="nav-button" [class.nav-active]="activePage() === 'login'">Login</a>
-      <a routerLink="/register" class="nav-button nav-primary" [class.nav-active]="activePage() === 'register'">Signup</a>
+      <a routerLink="/register" class="nav-button" [class.nav-active]="activePage() === 'register'">Signup</a>
     }
   </div>
 </header>

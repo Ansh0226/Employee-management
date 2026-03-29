@@ -22,6 +22,7 @@ export class DashboardStoreService {
   readonly noticeTone = signal<NoticeTone>('info');
   readonly users = signal<UserRecord[]>([]);
   readonly adminUsers = signal<UserRecord[]>([]);
+  readonly locationUsers = signal<UserRecord[]>([]);
   readonly selectedUser = signal<UserRecord | null>(null);
   readonly pageNumber = signal(0);
   readonly pageSize = signal(5);
@@ -56,6 +57,15 @@ export class DashboardStoreService {
   readonly managerUsers = computed(() =>
     this.adminUsers().filter((user) => user.role === 'MANAGER')
   );
+  readonly locationOptions = computed(() => {
+    const source = this.locationUsers().length ? this.locationUsers() : this.users();
+
+    return [...new Set(
+      source
+        .map((user) => user.location?.trim())
+        .filter((location): location is string => !!location)
+    )].sort((first, second) => first.localeCompare(second));
+  });
   readonly hasAgeFilter = computed(() => {
     const filters = this.filters();
     return filters.minAge !== null && filters.maxAge !== null;
@@ -63,6 +73,7 @@ export class DashboardStoreService {
 
   refresh(): void {
     this.loadDirectory();
+    this.loadLocationUsers();
 
     if (this.isAdmin()) {
       this.loadAdminUsers();
@@ -403,6 +414,28 @@ export class DashboardStoreService {
           this.adminBusy.set(false);
         }
       });
+  }
+
+  private loadLocationUsers(): void {
+    if (this.isAdmin()) {
+      this.http
+        .get<ApiResponse<UserRecord[]>>(`${this.apiBase}/admin/users`, { headers: this.authHeaders() })
+        .subscribe({
+          next: (response) => this.locationUsers.set(response.data ?? []),
+          error: () => this.locationUsers.set([])
+        });
+      return;
+    }
+
+    if (this.isManager()) {
+      this.workflow.getMyTeam().subscribe({
+        next: (response) => this.locationUsers.set(response.data ?? []),
+        error: () => this.locationUsers.set([])
+      });
+      return;
+    }
+
+    this.locationUsers.set(this.users());
   }
 
   private syncSelectedUser(): void {
