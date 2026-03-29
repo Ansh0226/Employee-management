@@ -13,7 +13,12 @@
         <select [(ngModel)]="form.employeeId">
           <option [ngValue]="0">Select employee</option>
           @for (employee of employees(); track employee.id) {
-            <option [ngValue]="employee.id">{{ employee.firstName }} {{ employee.lastName }} | {{ employee.employeeId }}</option>
+            <option [ngValue]="employee.id">
+              {{ employee.firstName }} {{ employee.lastName }} | {{ employee.employeeId }}
+              @if (employee.managerName) {
+                | Assigned
+              }
+            </option>
           }
         </select>
       </label>
@@ -135,4 +140,30 @@
 
 @if (selectedProject(); as project) {
   <app-project-detail-modal [project]="project" (close)="closeProjectModal()" />
+}
+
+@if (reassignModalOpen() && selectedEmployeeForAssignment(); as employee) {
+  <div class="modal-backdrop" (click)="closeReassignModal()">
+    <section class="modal-card confirm-modal" (click)="$event.stopPropagation()">
+      <div class="modal-head">
+        <div>
+          <p class="eyebrow">Warning</p>
+          <h2>Reassign employee?</h2>
+        </div>
+        <button type="button" class="ghost-button" (click)="closeReassignModal()">Close</button>
+      </div>
+
+      <p class="confirm-copy">
+        {{ employee.firstName }} {{ employee.lastName }} is already assigned to
+        <strong>{{ employee.managerName }}</strong>.
+        Do you want to reassign this employee to
+        <strong>{{ targetManagerForAssignment()?.firstName }} {{ targetManagerForAssignment()?.lastName }}</strong>?
+      </p>
+
+      <div class="confirm-actions">
+        <button type="button" class="ghost-button" (click)="closeReassignModal()">Cancel</button>
+        <button type="button" class="primary-button" (click)="confirmReassign()" [disabled]="assigning()">Reassign</button>
+      </div>
+    </section>
+  </div>
 }

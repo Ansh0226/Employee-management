@@ -3,6 +3,7 @@ package com.ems.employee_management.controller;
 import com.ems.employee_management.dto.ApiResponse;
 import com.ems.employee_management.dto.UserResponse;
 import com.ems.employee_management.entity.User;
+import com.ems.employee_management.entity.enums.Role;
 import com.ems.employee_management.service.EmployeeService;
 import com.ems.employee_management.service.ManagerService;
 import lombok.RequiredArgsConstructor;
@@ -22,11 +23,12 @@ public class ManagerController {
     public ApiResponse<Page<UserResponse>> getApprovedEmployees(
             @RequestParam int page,
             @RequestParam int size,
+            @RequestParam(required = false) Role role,
             @RequestParam(defaultValue = "firstName") String sortBy,
             @RequestParam(defaultValue = "asc") String direction) {
 
         Page<UserResponse> users = managerService
-                .getApprovedEmployees(page, size, sortBy, direction)
+                .getApprovedEmployees(page, size, role, sortBy, direction)
                 .map(employeeService::mapToDto);
 
         return ApiResponse.<Page<UserResponse>>builder()
@@ -42,11 +44,12 @@ public class ManagerController {
             @RequestParam String keyword,
             @RequestParam int page,
             @RequestParam int size,
+            @RequestParam(required = false) Role role,
             @RequestParam(defaultValue = "firstName") String sortBy,
             @RequestParam(defaultValue = "asc") String direction) {
 
         Page<UserResponse> users = managerService
-                .searchApproved(keyword, page, size, sortBy, direction)
+                .searchApproved(keyword, page, size, role, sortBy, direction)
                 .map(employeeService::mapToDto);
 
         return ApiResponse.<Page<UserResponse>>builder()
@@ -62,11 +65,12 @@ public class ManagerController {
             @RequestParam String location,
             @RequestParam int page,
             @RequestParam int size,
+            @RequestParam(required = false) Role role,
             @RequestParam(defaultValue = "firstName") String sortBy,
             @RequestParam(defaultValue = "asc") String direction) {
 
         Page<UserResponse> users = managerService
-                .filterByLocation(location, page, size, sortBy, direction)
+                .filterByLocation(location, page, size, role, sortBy, direction)
                 .map(employeeService::mapToDto);
 
         return ApiResponse.<Page<UserResponse>>builder()
@@ -82,11 +86,12 @@ public class ManagerController {
             @RequestParam int maxAge,
             @RequestParam int page,
             @RequestParam int size,
+            @RequestParam(required = false) Role role,
             @RequestParam(defaultValue = "firstName") String sortBy,
             @RequestParam(defaultValue = "asc") String direction) {
 
         Page<UserResponse> users = managerService
-                .filterByAgeRange(minAge, maxAge, page, size, sortBy, direction)
+                .filterByAgeRange(minAge, maxAge, page, size, role, sortBy, direction)
                 .map(employeeService::mapToDto);
 
         return ApiResponse.<Page<UserResponse>>builder()

@@ -30,6 +30,7 @@ export class DashboardStoreService {
   readonly filters = signal({
     keyword: '',
     location: '',
+    role: 'ALL' as Role | 'ALL',
     minAge: null as number | null,
     maxAge: null as number | null,
     sortBy: 'firstName',
@@ -43,13 +44,20 @@ export class DashboardStoreService {
   readonly isAdmin = computed(() => this.currentRole() === 'ADMIN');
   readonly isManager = computed(() => this.currentRole() === 'MANAGER');
   readonly visibleUsers = computed(() => {
-    const baseUsers = this.users().filter((user) => user.role !== 'ADMIN');
+    const baseUsers = this.users()
+      .filter((user) => user.role !== 'ADMIN')
+      .filter((user) => user.status === 'APPROVED');
+
+    const roleFilter = this.filters().role;
+    const roleFilteredUsers = roleFilter === 'ALL'
+      ? baseUsers
+      : baseUsers.filter((user) => user.role === roleFilter);
 
     if (this.isManager()) {
-      return baseUsers.filter((user) => user.role === 'EMPLOYEE');
+      return roleFilteredUsers.filter((user) => user.role === 'EMPLOYEE');
     }
 
-    return baseUsers;
+    return roleFilteredUsers;
   });
   readonly pendingApprovals = computed(() =>
     this.adminUsers().filter((user) => user.status === 'PENDING' && user.role !== 'ADMIN')
@@ -62,6 +70,8 @@ export class DashboardStoreService {
 
     return [...new Set(
       source
+        .filter((user) => user.status === 'APPROVED')
+        .filter((user) => user.role !== 'ADMIN')
         .map((user) => user.location?.trim())
         .filter((location): location is string => !!location)
     )].sort((first, second) => first.localeCompare(second));
@@ -89,6 +99,7 @@ export class DashboardStoreService {
     this.filters.set({
       keyword: '',
       location: '',
+      role: 'ALL',
       minAge: null,
       maxAge: null,
       sortBy: 'firstName',
@@ -360,26 +371,27 @@ export class DashboardStoreService {
     const filters = this.filters();
     const keyword = filters.keyword.trim();
     const location = filters.location.trim();
+    const role = filters.role === 'ALL' ? '' : `&role=${filters.role}`;
     const canUseAgeFilter = this.hasAgeFilter();
 
     let endpoint = '';
 
     if (keyword) {
       endpoint = this.isManager()
-        ? `/manager/search?keyword=${encodeURIComponent(keyword)}&page=${page}&size=${size}&sortBy=${filters.sortBy}&direction=${filters.direction}`
-        : `/employee/search?keyword=${encodeURIComponent(keyword)}&page=${page}&size=${size}`;
+        ? `/manager/search?keyword=${encodeURIComponent(keyword)}&page=${page}&size=${size}${role}&sortBy=${filters.sortBy}&direction=${filters.direction}`
+        : `/employee/search?keyword=${encodeURIComponent(keyword)}&page=${page}&size=${size}${role}`;
     } else if (location) {
       endpoint = this.isManager()
-        ? `/manager/filter/location?location=${encodeURIComponent(location)}&page=${page}&size=${size}&sortBy=${filters.sortBy}&direction=${filters.direction}`
-        : `/employee/filter/location?location=${encodeURIComponent(location)}&page=${page}&size=${size}`;
+        ? `/manager/filter/location?location=${encodeURIComponent(location)}&page=${page}&size=${size}${role}&sortBy=${filters.sortBy}&direction=${filters.direction}`
+        : `/employee/filter/location?location=${encodeURIComponent(location)}&page=${page}&size=${size}${role}`;
     } else if (canUseAgeFilter) {
       endpoint = this.isManager()
-        ? `/manager/filter/age-range?minAge=${filters.minAge}&maxAge=${filters.maxAge}&page=${page}&size=${size}&sortBy=${filters.sortBy}&direction=${filters.direction}`
-        : `/employee/filter/age-range?minAge=${filters.minAge}&maxAge=${filters.maxAge}&page=${page}&size=${size}`;
+        ? `/manager/filter/age-range?minAge=${filters.minAge}&maxAge=${filters.maxAge}&page=${page}&size=${size}${role}&sortBy=${filters.sortBy}&direction=${filters.direction}`
+        : `/employee/filter/age-range?minAge=${filters.minAge}&maxAge=${filters.maxAge}&page=${page}&size=${size}${role}`;
     } else {
       endpoint = this.isManager()
-        ? `/manager/employees?page=${page}&size=${size}&sortBy=${filters.sortBy}&direction=${filters.direction}`
-        : `/employee?page=${page}&size=${size}&sortBy=${filters.sortBy}&direction=${filters.direction}`;
+        ? `/manager/employees?page=${page}&size=${size}${role}&sortBy=${filters.sortBy}&direction=${filters.direction}`
+        : `/employee?page=${page}&size=${size}${role}&sortBy=${filters.sortBy}&direction=${filters.direction}`;
     }
 
     this.http
@@ -466,6 +478,7 @@ export class DashboardStoreService {
       viewRole: this.currentRole() ?? 'EMPLOYEE',
       keyword: filters.keyword,
       location: filters.location,
+      role: filters.role,
       sortBy: filters.sortBy,
       direction: filters.direction
     });

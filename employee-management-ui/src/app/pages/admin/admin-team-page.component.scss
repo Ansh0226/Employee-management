@@ -63,5 +63,9 @@ select { padding: 13px 14px; border: 1px solid var(--border); background: var(--
 .inner-card { display: grid; gap: 12px; min-height: 320px; }
 .compact-card { min-height: 0; }
 .small-modal { width: min(620px, 100%); }
+.confirm-modal { width: min(520px, 100%); }
+.confirm-copy { margin: 0; color: var(--muted); line-height: 1.6; }
+.confirm-copy strong { color: var(--text); }
+.confirm-actions { display: flex; justify-content: flex-end; gap: 12px; }
 .ghost-button { border: 1px solid var(--border); border-radius: 14px; padding: 11px 16px; background: var(--card); color: var(--text); font: inherit; cursor: pointer; }
 @media (max-width: 1180px) { .page-grid, .detail-grid, .split-grid { grid-template-columns: 1fr; height: auto; } .card { height: auto; min-height: 320px; } }

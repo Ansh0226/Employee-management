@@ -29,10 +29,17 @@ export class AdminTeamPageComponent {
   protected readonly selectedProject = signal<any | null>(null);
   protected readonly selectedManagerId = signal<number | null>(null);
   protected readonly assigning = signal(false);
+  protected readonly reassignModalOpen = signal(false);
   protected readonly form = { employeeId: 0, managerId: 0 };
   protected readonly menuItems = ADMIN_MENU_ITEMS;
   protected readonly employees = computed(() =>
-    this.store.users().filter((user) => user.role === 'EMPLOYEE')
+    this.store.adminUsers().filter((user) => user.role === 'EMPLOYEE' && user.status === 'APPROVED')
+  );
+  protected readonly selectedEmployeeForAssignment = computed(() =>
+    this.employees().find((employee) => employee.id === this.form.employeeId) ?? null
+  );
+  protected readonly targetManagerForAssignment = computed(() =>
+    this.managers().find((manager) => manager.id === this.form.managerId) ?? null
   );
 
   constructor(protected readonly store: DashboardStoreService) {
@@ -51,23 +58,29 @@ export class AdminTeamPageComponent {
       return;
     }
 
-    this.assigning.set(true);
-    this.workflow.assignEmployeeToManager(this.form).subscribe({
-      next: (response) => {
-        this.store.notice.set(response.message);
-        this.store.noticeTone.set('success');
-        this.assigning.set(false);
-        this.refresh();
-        if (this.selectedManagerId() === this.form.managerId) {
-          this.loadTeam(this.form.managerId);
-        }
-      },
-      error: (error) => {
-        this.store.notice.set(this.auth.getErrorMessage(error));
-        this.store.noticeTone.set('error');
-        this.assigning.set(false);
-      }
-    });
+    const employee = this.selectedEmployeeForAssignment();
+
+    if (employee?.managerId === this.form.managerId) {
+      this.store.notice.set('This employee is already assigned to the selected manager.');
+      this.store.noticeTone.set('error');
+      return;
+    }
+
+    if (employee?.managerId) {
+      this.reassignModalOpen.set(true);
+      return;
+    }
+
+    this.executeAssignment();
+  }
+
+  protected confirmReassign(): void {
+    this.reassignModalOpen.set(false);
+    this.executeAssignment();
+  }
+
+  protected closeReassignModal(): void {
+    this.reassignModalOpen.set(false);
   }
 
   protected chooseManager(managerId: number): void {
@@ -106,6 +119,26 @@ export class AdminTeamPageComponent {
 
   protected closeProjectModal(): void {
     this.selectedProject.set(null);
+  }
+
+  private executeAssignment(): void {
+    this.assigning.set(true);
+    this.workflow.assignEmployeeToManager(this.form).subscribe({
+      next: (response) => {
+        this.store.notice.set(response.message);
+        this.store.noticeTone.set('success');
+        this.assigning.set(false);
+        this.refresh();
+        if (this.selectedManagerId() === this.form.managerId) {
+          this.loadTeam(this.form.managerId);
+        }
+      },
+      error: (error) => {
+        this.store.notice.set(this.auth.getErrorMessage(error));
+        this.store.noticeTone.set('error');
+        this.assigning.set(false);
+      }
+    });
   }
 
   private loadManagers(): void {

@@ -59,8 +59,16 @@ public class AdminService {
             throw new BadRequestException("Selected user is not an employee");
         }
 
+        if (employee.getStatus() != Status.APPROVED) {
+            throw new BadRequestException("Only approved employees can be assigned");
+        }
+
         if (manager.getRole() != Role.MANAGER) {
             throw new BadRequestException("Selected user is not a manager");
+        }
+
+        if (manager.getStatus() != Status.APPROVED) {
+            throw new BadRequestException("Only approved managers can receive team assignments");
         }
 
         employee.setManager(manager);
@@ -68,10 +76,14 @@ public class AdminService {
     }
 
     public List<User> getManagers() {
-        return userRepository.findByRole(Role.MANAGER);
+        return userRepository.findByRole(Role.MANAGER).stream()
+                .filter(user -> user.getStatus() == Status.APPROVED)
+                .toList();
     }
 
     public List<User> getManagerTeam(Long managerId) {
-        return userRepository.findByManagerIdAndRole(managerId, Role.EMPLOYEE);
+        return userRepository.findByManagerIdAndRole(managerId, Role.EMPLOYEE).stream()
+                .filter(user -> user.getStatus() == Status.APPROVED)
+                .toList();
     }
 }

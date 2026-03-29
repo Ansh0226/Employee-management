@@ -66,6 +66,16 @@
           }
         </select>
 
+        <select
+          [ngModel]="state.filters().role"
+          (ngModelChange)="state.updateFilter('role', $event)"
+          name="role"
+        >
+          <option value="ALL">All roles</option>
+          <option value="EMPLOYEE">Employee</option>
+          <option value="MANAGER">Manager</option>
+        </select>
+
             @if (showSortControls()) {
               <select
                 [ngModel]="state.filters().sortBy"

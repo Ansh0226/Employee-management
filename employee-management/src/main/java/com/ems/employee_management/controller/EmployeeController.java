@@ -7,6 +7,7 @@ import com.ems.employee_management.dto.UpdateUserRequest;
 import com.ems.employee_management.dto.UpdateProfileImageRequest;
 import com.ems.employee_management.dto.UserResponse;
 import com.ems.employee_management.entity.User;
+import com.ems.employee_management.entity.enums.Role;
 import com.ems.employee_management.service.EmployeeService;
 import com.ems.employee_management.service.UserService;
 import jakarta.validation.Valid;
@@ -27,11 +28,12 @@ public class EmployeeController {
     public ApiResponse<Page<UserResponse>> getAll(
             @RequestParam int page,
             @RequestParam int size,
+            @RequestParam(required = false) Role role,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String direction) {
 
         Page<UserResponse> users = employeeService
-                .getAllEmployees(page, size, sortBy, direction)
+                .getAllEmployees(page, size, role, sortBy, direction)
                 .map(employeeService::mapToDto);
 
         return ApiResponse.<Page<UserResponse>>builder()
@@ -46,10 +48,11 @@ public class EmployeeController {
     public ApiResponse<Page<UserResponse>> search(
             @RequestParam String keyword,
             @RequestParam int page,
-            @RequestParam int size) {
+            @RequestParam int size,
+            @RequestParam(required = false) Role role) {
 
         Page<UserResponse> users = employeeService
-                .search(keyword, page, size)
+                .search(keyword, page, size, role)
                 .map(employeeService::mapToDto);
 
         return ApiResponse.<Page<UserResponse>>builder()
@@ -64,10 +67,11 @@ public class EmployeeController {
     public ApiResponse<Page<UserResponse>> filterByLocation(
             @RequestParam String location,
             @RequestParam int page,
-            @RequestParam int size) {
+            @RequestParam int size,
+            @RequestParam(required = false) Role role) {
 
         Page<UserResponse> users = employeeService
-                .filterByLocation(location.trim(), page, size)
+                .filterByLocation(location.trim(), page, size, role)
                 .map(employeeService::mapToDto);
 
         return ApiResponse.<Page<UserResponse>>builder()
@@ -83,10 +87,11 @@ public class EmployeeController {
             @RequestParam int minAge,
             @RequestParam int maxAge,
             @RequestParam int page,
-            @RequestParam int size) {
+            @RequestParam int size,
+            @RequestParam(required = false) Role role) {
 
         Page<UserResponse> users = employeeService
-                .filterByAgeRange(minAge, maxAge, page, size)
+                .filterByAgeRange(minAge, maxAge, page, size, role)
                 .map(employeeService::mapToDto);
 
         return ApiResponse.<Page<UserResponse>>builder()

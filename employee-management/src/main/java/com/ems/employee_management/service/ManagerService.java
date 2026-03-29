@@ -24,36 +24,39 @@ public class ManagerService {
     private final UserRepository userRepository;
     private final UserService userService;
 
-    public Page<User> getApprovedEmployees(int page, int size, String sortBy, String direction) {
+    public Page<User> getApprovedEmployees(int page, int size, Role roleFilter, String sortBy, String direction) {
         List<User> users = getApprovedEmployeesList();
+        users = applyRoleFilter(users, roleFilter);
         users = sortUsers(users, sortBy, direction);
 
         return toPage(users, page, size);
     }
 
-    public Page<User> searchApproved(String keyword, int page, int size, String sortBy, String direction) {
+    public Page<User> searchApproved(String keyword, int page, int size, Role roleFilter, String sortBy, String direction) {
         String searchText = keyword.trim().toLowerCase();
 
         List<User> users = getApprovedEmployeesList().stream()
                 .filter(user -> matchesKeyword(user, searchText))
                 .toList();
 
+        users = applyRoleFilter(users, roleFilter);
         users = sortUsers(users, sortBy, direction);
         return toPage(users, page, size);
     }
 
-    public Page<User> filterByLocation(String location, int page, int size, String sortBy, String direction) {
+    public Page<User> filterByLocation(String location, int page, int size, Role roleFilter, String sortBy, String direction) {
         String cleanLocation = location.trim();
 
         List<User> users = getApprovedEmployeesList().stream()
                 .filter(user -> cleanLocation.equalsIgnoreCase(user.getLocation()))
                 .toList();
 
+        users = applyRoleFilter(users, roleFilter);
         users = sortUsers(users, sortBy, direction);
         return toPage(users, page, size);
     }
 
-    public Page<User> filterByAgeRange(int minAge, int maxAge, int page, int size, String sortBy, String direction) {
+    public Page<User> filterByAgeRange(int minAge, int maxAge, int page, int size, Role roleFilter, String sortBy, String direction) {
         List<User> users = getApprovedEmployeesList().stream()
                 .filter(user -> user.getDob() != null)
                 .filter(user -> {
@@ -62,6 +65,7 @@ public class ManagerService {
                 })
                 .toList();
 
+        users = applyRoleFilter(users, roleFilter);
         users = sortUsers(users, sortBy, direction);
         return toPage(users, page, size);
     }
@@ -93,6 +97,14 @@ public class ManagerService {
                 .filter(user -> user.getStatus() == Status.APPROVED)
                 .filter(user -> user.getRole() == Role.EMPLOYEE)
                 .toList();
+    }
+
+    private List<User> applyRoleFilter(List<User> users, Role roleFilter) {
+        if (roleFilter == null || roleFilter == Role.EMPLOYEE) {
+            return users;
+        }
+
+        return List.of();
     }
 
     private List<User> sortUsers(List<User> users, String sortBy, String direction) {
