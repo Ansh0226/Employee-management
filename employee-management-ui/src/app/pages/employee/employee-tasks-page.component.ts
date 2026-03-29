@@ -3,6 +3,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 
 import { TaskRecord } from '../../core/models';
 import { WorkflowService } from '../../core/workflow.service';
+import { EMPLOYEE_MENU_ITEMS } from '../../features/dashboard/dashboard-menu';
 import { DashboardLayoutComponent } from '../../features/dashboard/components/dashboard-layout/dashboard-layout.component';
 
 @Component({
@@ -17,10 +18,7 @@ export class EmployeeTasksPageComponent {
   protected readonly taskFilter = signal<'ALL' | 'PENDING' | 'WAITING' | 'COMPLETED'>('ALL');
   protected readonly notice = signal('');
   protected readonly noticeTone = signal<'success' | 'error'>('success');
-  protected readonly menuItems = [
-    { label: 'Directory', route: '/employee', note: 'Browse the employee directory.' },
-    { label: 'Tasks', route: '/employee/tasks', note: 'See and complete your assigned tasks.' }
-  ];
+  protected readonly menuItems = EMPLOYEE_MENU_ITEMS;
   protected readonly filteredTasks = computed(() => {
     if (this.taskFilter() === 'ALL') {
       return this.tasks();

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 
 import { ProjectDetailRecord, ProjectRecord, UserRecord } from '../../core/models';
 import { WorkflowService } from '../../core/workflow.service';
+import { ADMIN_MENU_ITEMS } from '../../features/dashboard/dashboard-menu';
 import { DashboardLayoutComponent } from '../../features/dashboard/components/dashboard-layout/dashboard-layout.component';
 import { ProjectDetailModalComponent } from '../../shared/project-detail-modal/project-detail-modal.component';
 
@@ -23,12 +24,7 @@ export class AdminProjectsPageComponent {
   protected readonly noticeTone = signal<'success' | 'error'>('success');
   protected readonly projectForm = { name: '', description: '' };
   protected readonly assignForm = { projectId: 0, managerId: 0 };
-  protected readonly menuItems = [
-    { label: 'Directory', route: '/admin', note: 'Search, filter, export, and view employees.' },
-    { label: 'Team', route: '/admin/team', note: 'Assign employees to managers.' },
-    { label: 'Projects', route: '/admin/projects', note: 'Create projects and assign managers.' },
-    { label: 'Approvals', route: '/admin/approvals', note: 'Approve newly registered users.' }
-  ];
+  protected readonly menuItems = ADMIN_MENU_ITEMS;
 
   constructor() {
     this.refresh();

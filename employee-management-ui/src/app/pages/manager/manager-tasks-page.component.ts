@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 
 import { CreateTaskRequest, ProjectRecord, TaskRecord, UserRecord } from '../../core/models';
 import { WorkflowService } from '../../core/workflow.service';
+import { MANAGER_MENU_ITEMS } from '../../features/dashboard/dashboard-menu';
 import { DashboardLayoutComponent } from '../../features/dashboard/components/dashboard-layout/dashboard-layout.component';
 
 @Component({
@@ -17,19 +18,13 @@ export class ManagerTasksPageComponent {
   protected readonly team = signal<UserRecord[]>([]);
   protected readonly projects = signal<ProjectRecord[]>([]);
   protected readonly tasks = signal<TaskRecord[]>([]);
-  protected readonly approvals = signal<TaskRecord[]>([]);
   protected readonly createModalOpen = signal(false);
   protected readonly selectedTask = signal<TaskRecord | null>(null);
   protected readonly taskFilter = signal<'PENDING' | 'WAITING' | 'COMPLETED'>('PENDING');
   protected readonly notice = signal('');
   protected readonly noticeTone = signal<'success' | 'error'>('success');
   protected readonly taskForm: CreateTaskRequest = { title: '', description: '', projectId: 0, employeeId: 0 };
-  protected readonly menuItems = [
-    { label: 'Directory', route: '/manager', note: 'See approved employees in your directory.' },
-    { label: 'Team', route: '/manager/team', note: 'View your assigned team.' },
-    { label: 'Projects', route: '/manager/projects', note: 'See your assigned projects.' },
-    { label: 'Tasks', route: '/manager/tasks', note: 'Create tasks and approve completed work.' }
-  ];
+  protected readonly menuItems = MANAGER_MENU_ITEMS;
   protected readonly filteredTasks = computed(() => {
     if (this.taskFilter() === 'WAITING') {
       return this.tasks().filter((task) => task.status === 'COMPLETED');
@@ -50,7 +45,6 @@ export class ManagerTasksPageComponent {
     this.workflow.getMyTeam().subscribe({ next: (response) => this.team.set(response.data ?? []) });
     this.workflow.getMyProjects().subscribe({ next: (response) => this.projects.set(response.data ?? []) });
     this.workflow.getManagerTasks().subscribe({ next: (response) => this.tasks.set(response.data ?? []) });
-    this.workflow.getPendingTaskApprovals().subscribe({ next: (response) => this.approvals.set(response.data ?? []) });
   }
 
   protected createTask(): void {

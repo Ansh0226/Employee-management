@@ -3,7 +3,7 @@ import { Injectable, PLATFORM_ID, computed, inject, signal } from '@angular/core
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 
-import { ApiResponse, ChangePasswordRequest, LoginRequest, NoticeTone, Role, SignupRequest, UpdateProfileImageRequest, UserRecord } from './models';
+import { ApiResponse, ChangePasswordRequest, LoginRequest, NoticeTone, Role, SignupRequest, UpdateProfileContactRequest, UpdateProfileImageRequest, UserRecord } from './models';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -55,6 +55,12 @@ export class AuthService {
 
   updateProfileImage(payload: UpdateProfileImageRequest) {
     return this.http.put<ApiResponse<UserRecord>>(`${this.apiBase}/employee/profile-image`, payload, {
+      headers: this.authHeaders()
+    });
+  }
+
+  updateProfileContact(payload: UpdateProfileContactRequest) {
+    return this.http.put<ApiResponse<UserRecord>>(`${this.apiBase}/employee/profile-contact`, payload, {
       headers: this.authHeaders()
     });
   }

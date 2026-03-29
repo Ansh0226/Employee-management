@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 
+import { ADMIN_MENU_ITEMS } from '../../features/dashboard/dashboard-menu';
 import { DirectoryWorkspaceComponent } from '../../features/dashboard/components/directory-workspace/directory-workspace.component';
 import { DashboardLayoutComponent } from '../../features/dashboard/components/dashboard-layout/dashboard-layout.component';
 import { DashboardStoreService } from '../../features/dashboard/services/dashboard-store.service';
@@ -11,12 +12,7 @@ import { DashboardStoreService } from '../../features/dashboard/services/dashboa
   templateUrl: './admin-dashboard-page.component.html'
 })
 export class AdminDashboardPageComponent {
-  protected readonly menuItems = [
-    { label: 'Directory', route: '/admin', note: 'Search, filter, export, and view employees.' },
-    { label: 'Team', route: '/admin/team', note: 'Assign employees to managers.' },
-    { label: 'Projects', route: '/admin/projects', note: 'Create projects and assign managers.' },
-    { label: 'Approvals', route: '/admin/approvals', note: 'Approve newly registered users.' }
-  ];
+  protected readonly menuItems = ADMIN_MENU_ITEMS;
 
   constructor(protected readonly store: DashboardStoreService) {
     this.store.refresh();

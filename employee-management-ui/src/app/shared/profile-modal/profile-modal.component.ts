@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, input, output, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 
 import { AuthService } from '../../core/auth.service';
@@ -22,21 +22,34 @@ export class ProfileModalComponent {
   readonly profileLabel = input('U');
   readonly close = output<void>();
 
+  protected readonly contactPattern = '^[6-9]\\d{9}$';
   protected readonly passwordPattern = '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$';
+  protected readonly editingContact = signal(false);
   protected readonly imagePreviewVisible = signal(false);
   protected readonly projects = signal<ProjectRecord[]>([]);
   protected readonly selectedProject = signal<ProjectDetailRecord | null>(null);
+  protected readonly contactDraft = signal('');
   protected readonly passwordForm = {
     currentPassword: '',
     newPassword: ''
   };
+  protected readonly canSaveContact = computed(() =>
+    new RegExp(this.contactPattern).test(this.contactDraft().trim())
+    && this.contactDraft().trim() !== (this.profile()?.contactNumber ?? '')
+  );
 
   constructor() {
     this.loadProjects();
+    effect(() => {
+      this.contactDraft.set(this.profile()?.contactNumber ?? '');
+      this.editingContact.set(false);
+    });
   }
 
   protected onClose(): void {
+    this.editingContact.set(false);
     this.imagePreviewVisible.set(false);
+    this.contactDraft.set(this.profile()?.contactNumber ?? '');
     this.passwordForm.currentPassword = '';
     this.passwordForm.newPassword = '';
     this.close.emit();
@@ -101,6 +114,35 @@ export class ProfileModalComponent {
       });
     };
     reader.readAsDataURL(file);
+  }
+
+  protected openContactEditor(): void {
+    this.contactDraft.set(this.profile()?.contactNumber ?? '');
+    this.editingContact.set(true);
+  }
+
+  protected cancelContactEdit(): void {
+    this.contactDraft.set(this.profile()?.contactNumber ?? '');
+    this.editingContact.set(false);
+  }
+
+  protected saveContact(): void {
+    const contactNumber = this.contactDraft().trim();
+
+    if (!this.canSaveContact()) {
+      return;
+    }
+
+    this.auth.updateProfileContact({ contactNumber }).subscribe({
+      next: (response) => {
+        this.auth.setCurrentProfile(response.data);
+        this.auth.setNotice(response.message, 'success');
+        this.editingContact.set(false);
+      },
+      error: (error) => {
+        this.auth.setNotice(this.auth.getErrorMessage(error), 'error');
+      }
+    });
   }
 
   private loadProjects(): void {

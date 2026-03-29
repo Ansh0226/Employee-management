@@ -1,4 +1,9 @@
-<app-dashboard-layout title="Admin Dashboard" [items]="menuItems" activeItem="/admin" [refreshHandler]="store.refresh.bind(store)">
+<app-dashboard-layout
+  title="Admin Dashboard"
+  [items]="menuItems"
+  activeItem="/admin"
+  [refreshHandler]="store.refresh.bind(store)"
+>
   <app-directory-workspace
     [store]="store"
     title="Admin directory"

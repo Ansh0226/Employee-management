@@ -98,18 +98,6 @@
         <p>{{ task.description || 'No description added for this task.' }}</p>
       </section>
 
-      @if (task.status === 'ASSIGNED') {
-        <p class="task-state-note">This task is still pending with the employee.</p>
-      }
-
-      @if (task.status === 'COMPLETED') {
-        <p class="task-state-note">The employee marked this task complete. It is waiting for your approval.</p>
-      }
-
-      @if (task.status === 'APPROVED') {
-        <p class="task-state-note">This task has been approved and is now completed.</p>
-      }
-
       @if (task.status === 'COMPLETED') {
         <button type="button" class="primary-button" (click)="approveTask(task.id); closeTaskModal()">Approve task</button>
       }

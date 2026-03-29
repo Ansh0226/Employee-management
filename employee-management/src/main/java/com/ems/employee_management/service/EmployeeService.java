@@ -148,6 +148,7 @@ public class EmployeeService {
                 .contactNumber(user.getContactNumber())
                 .location(user.getLocation())
                 .profileImage(user.getProfileImage())
+                .dob(user.getDob())
                 .age(user.getAge()) // calculated from DOB
                 .managerId(user.getManager() != null ? user.getManager().getId() : null)
                 .managerName(user.getManager() != null

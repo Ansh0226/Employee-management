@@ -2,6 +2,7 @@ package com.ems.employee_management.controller;
 
 import com.ems.employee_management.dto.ApiResponse;
 import com.ems.employee_management.dto.ChangePasswordRequest;
+import com.ems.employee_management.dto.UpdateProfileContactRequest;
 import com.ems.employee_management.dto.UpdateUserRequest;
 import com.ems.employee_management.dto.UpdateProfileImageRequest;
 import com.ems.employee_management.dto.UserResponse;
@@ -154,6 +155,17 @@ public class EmployeeController {
         return ApiResponse.<UserResponse>builder()
                 .success(true)
                 .message("Profile image updated successfully")
+                .data(employeeService.mapToDto(updatedUser))
+                .build();
+    }
+
+    @PutMapping("/profile-contact")
+    public ApiResponse<UserResponse> updateProfileContact(@Valid @RequestBody UpdateProfileContactRequest request) {
+        User updatedUser = userService.updateProfileContact(request);
+
+        return ApiResponse.<UserResponse>builder()
+                .success(true)
+                .message("Contact number updated successfully")
                 .data(employeeService.mapToDto(updatedUser))
                 .build();
     }

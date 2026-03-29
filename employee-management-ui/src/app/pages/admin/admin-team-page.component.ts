@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/auth.service';
 import { ProjectRecord, UserRecord } from '../../core/models';
 import { WorkflowService } from '../../core/workflow.service';
+import { ADMIN_MENU_ITEMS } from '../../features/dashboard/dashboard-menu';
 import { DashboardLayoutComponent } from '../../features/dashboard/components/dashboard-layout/dashboard-layout.component';
 import { DashboardStoreService } from '../../features/dashboard/services/dashboard-store.service';
 import { ProjectDetailModalComponent } from '../../shared/project-detail-modal/project-detail-modal.component';
@@ -29,12 +30,7 @@ export class AdminTeamPageComponent {
   protected readonly selectedManagerId = signal<number | null>(null);
   protected readonly assigning = signal(false);
   protected readonly form = { employeeId: 0, managerId: 0 };
-  protected readonly menuItems = [
-    { label: 'Directory', route: '/admin', note: 'Search, filter, export, and view employees.' },
-    { label: 'Team', route: '/admin/team', note: 'Assign employees to managers.' },
-    { label: 'Projects', route: '/admin/projects', note: 'Create projects and assign managers.' },
-    { label: 'Approvals', route: '/admin/approvals', note: 'Approve newly registered users.' }
-  ];
+  protected readonly menuItems = ADMIN_MENU_ITEMS;
   protected readonly employees = computed(() =>
     this.store.users().filter((user) => user.role === 'EMPLOYEE')
   );

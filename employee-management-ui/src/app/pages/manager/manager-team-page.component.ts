@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 
 import { ProjectDetailRecord, ProjectRecord, UserRecord } from '../../core/models';
 import { WorkflowService } from '../../core/workflow.service';
+import { MANAGER_MENU_ITEMS } from '../../features/dashboard/dashboard-menu';
 import { DashboardLayoutComponent } from '../../features/dashboard/components/dashboard-layout/dashboard-layout.component';
 import { ProjectDetailModalComponent } from '../../shared/project-detail-modal/project-detail-modal.component';
 
@@ -23,12 +24,7 @@ export class ManagerTeamPageComponent {
   protected readonly savingLocation = signal(false);
   protected readonly notice = signal('');
   protected readonly noticeTone = signal<'success' | 'error'>('success');
-  protected readonly menuItems = [
-    { label: 'Directory', route: '/manager', note: 'See approved employees in your directory.' },
-    { label: 'Team', route: '/manager/team', note: 'View your assigned team.' },
-    { label: 'Projects', route: '/manager/projects', note: 'See your assigned projects.' },
-    { label: 'Tasks', route: '/manager/tasks', note: 'Create tasks and approve completed work.' }
-  ];
+  protected readonly menuItems = MANAGER_MENU_ITEMS;
 
   constructor() {
     this.refresh();

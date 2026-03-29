@@ -14,6 +14,7 @@ export interface UserRecord {
   contactNumber: string;
   location: string;
   profileImage?: string | null;
+  dob?: string | null;
   age: number;
   managerId?: number | null;
   managerName?: string | null;
@@ -82,6 +83,10 @@ export interface ChangePasswordRequest {
 
 export interface UpdateProfileImageRequest {
   profileImage: string;
+}
+
+export interface UpdateProfileContactRequest {
+  contactNumber: string;
 }
 
 export interface AssignEmployeeManagerRequest {

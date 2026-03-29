@@ -4,7 +4,6 @@ import { RouterLink } from '@angular/router';
 export interface SidebarItem {
   label: string;
   route: string;
-  note: string;
 }
 
 @Component({

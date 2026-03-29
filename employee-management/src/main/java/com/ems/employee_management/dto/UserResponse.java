@@ -3,6 +3,8 @@ package com.ems.employee_management.dto;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDate;
+
 @Data
 @Builder
 public class UserResponse {
@@ -16,6 +18,7 @@ public class UserResponse {
     private String contactNumber;
     private String location;
     private String profileImage;
+    private LocalDate dob;
     private Integer age;
     private Long managerId;
     private String managerName;

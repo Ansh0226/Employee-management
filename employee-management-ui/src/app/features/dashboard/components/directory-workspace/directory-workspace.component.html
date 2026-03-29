@@ -9,7 +9,11 @@
     </section>
   }
 
-  <section class="workspace-grid" [class.single-column]="!showApprovals()" [class.list-only]="showDetailAsModal() && !showApprovals()">
+  <section
+    class="workspace-grid"
+    [class.single-column]="!showApprovals()"
+    [class.list-only]="showDetailAsModal() && !showApprovals()"
+  >
     <section class="directory-panel">
       <div class="panel-head">
         <div>
@@ -19,91 +23,167 @@
 
         @if (showExportButtons()) {
           <div class="action-row">
-            <button type="button" class="ghost-button" (click)="state.exportDirectory('excel')" [disabled]="state.exportBusy()">Export Excel</button>
-            <button type="button" class="ghost-button" (click)="state.exportDirectory('pdf')" [disabled]="state.exportBusy()">Export PDF</button>
+            <button
+              type="button"
+              class="ghost-button"
+              (click)="state.exportDirectory('excel')"
+              [disabled]="state.exportBusy()"
+            >
+              Export Excel
+            </button>
+            <button
+              type="button"
+              class="ghost-button"
+              (click)="state.exportDirectory('pdf')"
+              [disabled]="state.exportBusy()"
+            >
+              Export PDF
+            </button>
           </div>
         }
       </div>
 
-      <form class="filters-grid" (ngSubmit)="state.applyFilters()">
-        <input
-          [ngModel]="state.filters().keyword"
-          (ngModelChange)="state.updateFilter('keyword', $event)"
-          name="keyword"
-          placeholder="Search name, username, email, employee id"
-        />
-        <input
-          [ngModel]="state.filters().location"
-          (ngModelChange)="state.updateFilter('location', $event)"
-          name="location"
-          placeholder="Filter by location"
-        />
-
-        @if (showSortControls()) {
-          <select
-            [ngModel]="state.filters().sortBy"
-            (ngModelChange)="state.updateFilter('sortBy', $event)"
-            name="sortBy"
-          >
-            <option value="firstName">Sort by name</option>
-            <option value="employeeId">Sort by employee id</option>
-            <option value="email">Sort by email</option>
-            <option value="location">Sort by location</option>
-          </select>
-
-          <select
-            [ngModel]="state.filters().direction"
-            (ngModelChange)="state.updateFilter('direction', $event)"
-            name="direction"
-          >
-            <option value="asc">Ascending</option>
-            <option value="desc">Descending</option>
-          </select>
-        }
-
-        @if (showAgeFilters()) {
-          <input
-            [ngModel]="state.filters().minAge"
-            (ngModelChange)="state.updateFilter('minAge', $event)"
-            name="minAge"
-            type="number"
-            placeholder="Min age"
-          />
-          <input
-            [ngModel]="state.filters().maxAge"
-            (ngModelChange)="state.updateFilter('maxAge', $event)"
-            name="maxAge"
-            type="number"
-            placeholder="Max age"
-          />
-        }
-
-        <div class="action-row">
-          <button type="submit" class="primary-button" [disabled]="state.directoryBusy()">Apply</button>
-          <button type="button" class="ghost-button" (click)="state.resetFilters()" [disabled]="state.directoryBusy()">Reset</button>
-        </div>
-      </form>
-
-      <div class="list-shell">
-        @for (user of state.visibleUsers(); track user.id) {
-          <button type="button" class="list-item" [class.active]="state.isSelected(user)" (click)="state.chooseUser(user)">
-            <span>{{ user.firstName }} {{ user.lastName }}</span>
-            <small>{{ user.employeeId }}</small>
-          </button>
-        } @empty {
-          <div class="empty-state">
-            <h3>No employees found</h3>
-            <p>Try changing the search or filters.</p>
+      <div class="main-dir">
+        <section class="left filter-card">
+          <div class="filter-head">
+            <h3>Filters</h3>
           </div>
-        }
-      </div>
+          <form class="filters-grid" (ngSubmit)="state.applyFilters()">
+            <input
+              [ngModel]="state.filters().keyword"
+              (ngModelChange)="state.updateFilter('keyword', $event)"
+              name="keyword"
+              placeholder="Search name, username, email, employee id"
+            />
+            <input
+              [ngModel]="state.filters().location"
+              (ngModelChange)="state.updateFilter('location', $event)"
+              name="location"
+              placeholder="Filter by location"
+            />
 
-      <div class="pager">
-        <button type="button" class="ghost-button" (click)="state.goToPreviousPage()" [disabled]="state.pageNumber() === 0 || state.directoryBusy()">Previous</button>
-        <p class="page-indicator">
-          Page {{ state.totalPages() === 0 ? 0 : state.pageNumber() + 1 }} of {{ state.totalPages() }}
-        </p>
-        <button type="button" class="ghost-button" (click)="state.goToNextPage()" [disabled]="state.pageNumber() + 1 >= state.totalPages() || state.directoryBusy()">Next</button>
+            @if (showSortControls()) {
+              <select
+                [ngModel]="state.filters().sortBy"
+                (ngModelChange)="state.updateFilter('sortBy', $event)"
+                name="sortBy"
+              >
+                <option value="firstName">Sort by name</option>
+                <option value="employeeId">Sort by employee id</option>
+                <option value="email">Sort by email</option>
+                <option value="location">Sort by location</option>
+              </select>
+
+              <select
+                [ngModel]="state.filters().direction"
+                (ngModelChange)="state.updateFilter('direction', $event)"
+                name="direction"
+              >
+                <option value="asc">Ascending</option>
+                <option value="desc">Descending</option>
+              </select>
+            }
+
+            @if (showAgeFilters()) {
+              <input
+                [ngModel]="state.filters().minAge"
+                (ngModelChange)="state.updateFilter('minAge', $event)"
+                name="minAge"
+                type="number"
+                placeholder="Min age"
+              />
+              <input
+                [ngModel]="state.filters().maxAge"
+                (ngModelChange)="state.updateFilter('maxAge', $event)"
+                name="maxAge"
+                type="number"
+                placeholder="Max age"
+              />
+            }
+
+            <div class="action-row">
+              <button type="submit" class="primary-button" [disabled]="state.directoryBusy()">
+                Apply
+              </button>
+              <button
+                type="button"
+                class="ghost-button"
+                (click)="state.resetFilters()"
+                [disabled]="state.directoryBusy()"
+              >
+                Reset
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <section class="right directory-content-card">
+          <div class="directory-header-row">
+            <h2>Directory</h2>
+          </div>
+
+          <div class="list-shell">
+            @for (user of state.visibleUsers(); track user.id) {
+              <article
+                class="list-item"
+                tabindex="0"
+                role="button"
+                [class.active]="state.isSelected(user)"
+                (click)="state.chooseUser(user)"
+                (keydown.enter)="state.chooseUser(user)"
+                (keydown.space)="state.chooseUser(user); $event.preventDefault()"
+              >
+                <div class="directory-item-main">
+                  @if (user.profileImage) {
+                    <img [src]="user.profileImage" alt="Profile picture" class="list-avatar" />
+                  } @else {
+                    <div class="list-avatar-fallback">
+                      {{ user.firstName.charAt(0) }}{{ user.lastName.charAt(0) }}
+                    </div>
+                  }
+
+                  <div class="directory-item-copy">
+                    <strong>{{ user.firstName }} {{ user.lastName }}</strong>
+                    <!-- <small>{{ user.location || 'No location' }} - {{ user.employeeId }}</small> -->
+                  </div>
+                </div>
+
+                <div class="directory-item-meta">
+                  <span>LOCATION: {{ user.location || 'Not set' }}</span>
+                  <span>EMPLOYEE ID: {{ user.employeeId }}</span>
+                </div>
+              </article>
+            } @empty {
+              <div class="empty-state">
+                <h3>No employees found</h3>
+                <p>Try changing the search or filters.</p>
+              </div>
+            }
+          </div>
+
+          <div class="pager">
+            <button
+              type="button"
+              class="ghost-button"
+              (click)="state.goToPreviousPage()"
+              [disabled]="state.pageNumber() === 0 || state.directoryBusy()"
+            >
+              Previous
+            </button>
+            <p class="page-indicator">
+              Page {{ state.totalPages() === 0 ? 0 : state.pageNumber() + 1 }} of
+              {{ state.totalPages() }}
+            </p>
+            <button
+              type="button"
+              class="ghost-button"
+              (click)="state.goToNextPage()"
+              [disabled]="state.pageNumber() + 1 >= state.totalPages() || state.directoryBusy()"
+            >
+              Next
+            </button>
+          </div>
+        </section>
       </div>
     </section>
 
@@ -120,23 +200,48 @@
           <div class="detail-card">
             <div class="detail-hero">
               @if (user.profileImage) {
-                <img [src]="user.profileImage" alt="Profile picture" class="detail-photo" (click)="openImagePreview()" />
+                <img
+                  [src]="user.profileImage"
+                  alt="Profile picture"
+                  class="detail-photo"
+                  (click)="openImagePreview()"
+                />
               } @else {
                 <div class="detail-fallback">{{ state.selectedUserLabel() }}</div>
               }
             </div>
 
             <div class="detail-grid">
-              <div><span>Name</span><strong>{{ user.firstName }} {{ user.lastName }}</strong></div>
-              <div><span>Employee ID</span><strong>{{ user.employeeId }}</strong></div>
-              <div><span>Username</span><strong>{{ user.username }}</strong></div>
-              <div><span>Email</span><strong>{{ user.email }}</strong></div>
-              <div><span>Contact</span><strong>{{ user.contactNumber }}</strong></div>
-              <div><span>Age</span><strong>{{ user.age }}</strong></div>
-              <div><span>Location</span><strong>{{ user.location || 'Not set' }}</strong></div>
-              <div><span>Status</span><strong>{{ user.status }}</strong></div>
-              <div><span>Role</span><strong>{{ user.role }}</strong></div>
-              <div><span>Manager</span><strong>{{ user.managerName || 'Not assigned' }}</strong></div>
+              <div>
+                <span>Name</span><strong>{{ user.firstName }} {{ user.lastName }}</strong>
+              </div>
+              <div>
+                <span>Employee ID</span><strong>{{ user.employeeId }}</strong>
+              </div>
+              <div>
+                <span>Username</span><strong>{{ user.username }}</strong>
+              </div>
+              <div>
+                <span>Email</span><strong>{{ user.email }}</strong>
+              </div>
+              <div>
+                <span>Contact</span><strong>{{ user.contactNumber }}</strong>
+              </div>
+              <div>
+                <span>Age</span><strong>{{ user.age }}</strong>
+              </div>
+              <div>
+                <span>Location</span><strong>{{ user.location || 'Not set' }}</strong>
+              </div>
+              <div>
+                <span>Status</span><strong>{{ user.status }}</strong>
+              </div>
+              <div>
+                <span>Role</span><strong>{{ user.role }}</strong>
+              </div>
+              <div>
+                <span>Manager</span><strong>{{ user.managerName || 'Not assigned' }}</strong>
+              </div>
             </div>
 
             <section class="project-section">
@@ -164,7 +269,14 @@
                   [ngModelOptions]="{ standalone: true }"
                   placeholder="Enter new location"
                 />
-                <button type="button" class="primary-button" (click)="state.saveManagerLocation()" [disabled]="state.directoryBusy()">Update location</button>
+                <button
+                  type="button"
+                  class="primary-button"
+                  (click)="state.saveManagerLocation()"
+                  [disabled]="state.directoryBusy()"
+                >
+                  Update location
+                </button>
               </div>
             }
           </div>
@@ -193,7 +305,14 @@
                 <strong>{{ user.firstName }} {{ user.lastName }}</strong>
                 <small>{{ user.employeeId }}</small>
               </div>
-              <button type="button" class="primary-button" (click)="state.approveUser(user.id)" [disabled]="state.adminBusy()">Approve</button>
+              <button
+                type="button"
+                class="primary-button"
+                (click)="state.approveUser(user.id)"
+                [disabled]="state.adminBusy()"
+              >
+                Approve
+              </button>
             </article>
           } @empty {
             <div class="empty-state compact">
@@ -220,23 +339,48 @@
       <div class="detail-card modal-card">
         <div class="detail-hero">
           @if (user.profileImage) {
-            <img [src]="user.profileImage" alt="Profile picture" class="detail-photo" (click)="openImagePreview()" />
+            <img
+              [src]="user.profileImage"
+              alt="Profile picture"
+              class="detail-photo"
+              (click)="openImagePreview()"
+            />
           } @else {
             <div class="detail-fallback">{{ state.selectedUserLabel() }}</div>
           }
         </div>
 
         <div class="detail-grid">
-          <div><span>Name</span><strong>{{ user.firstName }} {{ user.lastName }}</strong></div>
-          <div><span>Employee ID</span><strong>{{ user.employeeId }}</strong></div>
-          <div><span>Username</span><strong>{{ user.username }}</strong></div>
-          <div><span>Email</span><strong>{{ user.email }}</strong></div>
-          <div><span>Contact</span><strong>{{ user.contactNumber }}</strong></div>
-          <div><span>Age</span><strong>{{ user.age }}</strong></div>
-          <div><span>Location</span><strong>{{ user.location || 'Not set' }}</strong></div>
-          <div><span>Status</span><strong>{{ user.status }}</strong></div>
-          <div><span>Role</span><strong>{{ user.role }}</strong></div>
-          <div><span>Manager</span><strong>{{ user.managerName || 'Not assigned' }}</strong></div>
+          <div>
+            <span>Name</span><strong>{{ user.firstName }} {{ user.lastName }}</strong>
+          </div>
+          <div>
+            <span>Employee ID</span><strong>{{ user.employeeId }}</strong>
+          </div>
+          <div>
+            <span>Username</span><strong>{{ user.username }}</strong>
+          </div>
+          <div>
+            <span>Email</span><strong>{{ user.email }}</strong>
+          </div>
+          <div>
+            <span>Contact</span><strong>{{ user.contactNumber }}</strong>
+          </div>
+          <div>
+            <span>Age</span><strong>{{ user.age }}</strong>
+          </div>
+          <div>
+            <span>Location</span><strong>{{ user.location || 'Not set' }}</strong>
+          </div>
+          <div>
+            <span>Status</span><strong>{{ user.status }}</strong>
+          </div>
+          <div>
+            <span>Role</span><strong>{{ user.role }}</strong>
+          </div>
+          <div>
+            <span>Manager</span><strong>{{ user.managerName || 'Not assigned' }}</strong>
+          </div>
         </div>
 
         <section class="project-section">
@@ -280,14 +424,23 @@
                 >
                   <option [ngValue]="null">Select manager</option>
                   @for (manager of state.managerUsers(); track manager.id) {
-                    <option [ngValue]="manager.id">{{ manager.firstName }} {{ manager.lastName }}</option>
+                    <option [ngValue]="manager.id">
+                      {{ manager.firstName }} {{ manager.lastName }}
+                    </option>
                   }
                 </select>
               </div>
             }
           </div>
 
-          <button type="button" class="primary-button" (click)="state.saveAdminUser()" [disabled]="state.adminBusy()">Save user</button>
+          <button
+            type="button"
+            class="primary-button"
+            (click)="state.saveAdminUser()"
+            [disabled]="state.adminBusy()"
+          >
+            Save user
+          </button>
         }
 
         @if (showLocationEditor()) {
@@ -299,7 +452,14 @@
               [ngModelOptions]="{ standalone: true }"
               placeholder="Enter new location"
             />
-            <button type="button" class="primary-button" (click)="state.saveManagerLocation()" [disabled]="state.directoryBusy()">Update location</button>
+            <button
+              type="button"
+              class="primary-button"
+              (click)="state.saveManagerLocation()"
+              [disabled]="state.directoryBusy()"
+            >
+              Update location
+            </button>
           </div>
         }
       </div>

@@ -2,6 +2,7 @@ package com.ems.employee_management.service;
 
 import com.ems.employee_management.dto.SignupRequest;
 import com.ems.employee_management.dto.ChangePasswordRequest;
+import com.ems.employee_management.dto.UpdateProfileContactRequest;
 import com.ems.employee_management.dto.UpdateProfileImageRequest;
 import com.ems.employee_management.entity.User;
 import com.ems.employee_management.entity.enums.Role;
@@ -126,6 +127,18 @@ public class UserService {
     public User updateProfileImage(UpdateProfileImageRequest request) {
         User user = getCurrentUser();
         user.setProfileImage(request.getProfileImage());
+        return userRepository.save(user);
+    }
+
+    public User updateProfileContact(UpdateProfileContactRequest request) {
+        User user = getCurrentUser();
+        String contactNumber = request.getContactNumber().trim();
+
+        if (!contactNumber.equals(user.getContactNumber()) && userRepository.existsByContactNumber(contactNumber)) {
+            throw new ResourceAlreadyExistsException("Contact number already exists");
+        }
+
+        user.setContactNumber(contactNumber);
         return userRepository.save(user);
     }
 }

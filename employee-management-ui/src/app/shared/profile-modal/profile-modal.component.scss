@@ -14,7 +14,7 @@
 }
 
 .profile-modal {
-  width: min(680px, 100%);
+  width: min(900px, 100%);
   max-height: min(82vh, 720px);
   overflow: auto;
   border-radius: 22px;
@@ -25,8 +25,7 @@
 }
 
 .modal-head,
-.profile-summary,
-.profile-grid {
+.profile-summary {
   display: flex;
   gap: 16px;
 }
@@ -41,11 +40,49 @@
   align-items: center;
 }
 
+.profile-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.profile-details,
+.profile-side,
+.project-panel,
+.password-form,
+.image-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.profile-details div,
+.password-form label,
+.image-upload-card {
+  display: grid;
+  gap: 6px;
+  padding: 11px 12px;
+  border-radius: 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+}
+
+.profile-side {
+  align-content: start;
+}
+
 .profile-photo,
 .profile-fallback {
   width: 56px;
   height: 56px;
   border-radius: 18px;
+}
+
+.profile-photo.large,
+.profile-fallback.large {
+  width: 132px;
+  height: 132px;
+  border-radius: 28px;
 }
 
 .profile-photo {
@@ -76,28 +113,47 @@
   font-size: 0.86rem;
 }
 
-.profile-grid {
-  align-items: flex-start;
+.image-panel h4,
+.project-panel h4,
+.password-form h4 {
+  margin: 0;
+  color: var(--text);
 }
 
-.profile-details,
-.project-panel,
-.password-form {
-  flex: 1;
+.contact-card {
+  align-content: start;
+}
+
+.detail-head,
+.inline-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.contact-display {
   display: grid;
   gap: 12px;
-}
-
-.profile-details div,
-.password-form label {
-  display: grid;
-  gap: 6px;
-  padding: 11px 12px;
+  align-content: start;
+  justify-items: start;
+  min-height: 82px;
+  padding: 12px 14px;
   border-radius: 14px;
-  background: var(--card);
   border: 1px solid var(--border);
+  background: var(--panel);
 }
 
+.contact-display strong {
+  color: var(--text);
+}
+
+.contact-editor {
+  display: grid;
+  gap: 8px;
+}
+
+.contact-editor input,
 .password-form input {
   width: 100%;
   padding: 10px 12px;
@@ -106,6 +162,49 @@
   background: var(--panel);
   color: var(--text);
   font: inherit;
+}
+
+.icon-button {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.icon-button svg,
+.camera-badge svg {
+  width: 14px;
+  height: 14px;
+}
+
+.image-upload-card {
+  position: relative;
+  place-items: center;
+  padding: 18px;
+  cursor: pointer;
+}
+
+.image-upload-card input[type='file'] {
+  display: none;
+}
+
+.camera-badge {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
 }
 
 .password-form input[type='file'] {
@@ -174,7 +273,7 @@
   }
 
   .modal-head,
-  .profile-grid {
+  .profile-summary {
     flex-direction: column;
     align-items: stretch;
   }
@@ -183,5 +282,14 @@
     width: 100%;
     max-height: 88vh;
     padding: 14px;
+  }
+
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-head,
+  .inline-actions {
+    flex-wrap: wrap;
   }
 }
