@@ -70,11 +70,6 @@ public class TaskService {
         return taskRepository.findByEmployeeId(employee.getId());
     }
 
-    public List<Task> getPendingApprovals() {
-        User manager = userService.getCurrentUser();
-        return taskRepository.findByManagerIdAndStatus(manager.getId(), TaskStatus.COMPLETED);
-    }
-
     public Task updateEmployeeTaskStatus(Long taskId, UpdateTaskStatusRequest request) {
         User employee = userService.getCurrentUser();
         Task task = getTask(taskId);
@@ -105,6 +100,21 @@ public class TaskService {
 
         task.setStatus(TaskStatus.APPROVED);
         return taskRepository.save(task);
+    }
+
+    public void deleteManagerTask(Long taskId) {
+        User manager = userService.getCurrentUser();
+        Task task = getTask(taskId);
+
+        if (!task.getManager().getId().equals(manager.getId())) {
+            throw new BadRequestException("You can delete your own tasks only");
+        }
+
+        if (task.getStatus() == TaskStatus.APPROVED) {
+            throw new BadRequestException("Approved tasks cannot be deleted");
+        }
+
+        taskRepository.delete(task);
     }
 
     public Task getTask(Long taskId) {

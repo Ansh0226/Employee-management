@@ -20,6 +20,8 @@ export class AdminProjectsPageComponent {
   protected readonly managers = signal<UserRecord[]>([]);
   protected readonly createModalOpen = signal(false);
   protected readonly selectedProject = signal<ProjectDetailRecord | null>(null);
+  protected readonly deleteErrorMessage = signal('');
+  protected readonly pendingDeleteProjectId = signal<number | null>(null);
   protected readonly notice = signal('');
   protected readonly noticeTone = signal<'success' | 'error'>('success');
   protected readonly projectForm = { name: '', description: '' };
@@ -70,6 +72,32 @@ export class AdminProjectsPageComponent {
     this.selectedProject.set(null);
   }
 
+  protected deleteProject(projectId: number): void {
+    this.pendingDeleteProjectId.set(projectId);
+  }
+
+  protected confirmDeleteProject(): void {
+    const projectId = this.pendingDeleteProjectId();
+
+    if (!projectId) {
+      return;
+    }
+
+    this.pendingDeleteProjectId.set(null);
+
+    this.workflow.deleteProject(projectId).subscribe({
+      next: (response) => {
+        this.notice.set(response.message);
+        this.noticeTone.set('success');
+        this.selectedProject.set(null);
+        this.refresh();
+      },
+      error: (error) => {
+        this.deleteErrorMessage.set(error?.error?.message || 'Unable to delete project.');
+      }
+    });
+  }
+
   protected assignManager(): void {
     this.workflow.assignProjectManager(this.assignForm).subscribe({
       next: (response) => {
@@ -82,5 +110,13 @@ export class AdminProjectsPageComponent {
         this.noticeTone.set('error');
       }
     });
+  }
+
+  protected closeDeleteErrorModal(): void {
+    this.deleteErrorMessage.set('');
+  }
+
+  protected closeDeleteConfirmModal(): void {
+    this.pendingDeleteProjectId.set(null);
   }
 }

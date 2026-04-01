@@ -11,9 +11,15 @@ import { ProjectDetailRecord } from '../../core/models';
 })
 export class ProjectDetailModalComponent {
   readonly project = input.required<ProjectDetailRecord>();
+  readonly allowDelete = input(false);
   readonly close = output<void>();
+  readonly delete = output<number>();
 
   protected onClose(): void {
     this.close.emit();
+  }
+
+  protected onDelete(): void {
+    this.delete.emit(this.project().id);
   }
 }

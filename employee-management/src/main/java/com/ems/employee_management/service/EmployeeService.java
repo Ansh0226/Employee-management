@@ -1,18 +1,18 @@
 package com.ems.employee_management.service;
 
-import com.ems.employee_management.dto.UpdateUserRequest;
 import com.ems.employee_management.dto.UserResponse;
 import com.ems.employee_management.entity.User;
 import com.ems.employee_management.entity.enums.Role;
 import com.ems.employee_management.entity.enums.Status;
 import com.ems.employee_management.exception.BadRequestException;
+import com.ems.employee_management.repository.ProjectRepository;
+import com.ems.employee_management.repository.TaskRepository;
 import com.ems.employee_management.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -25,6 +25,8 @@ import java.util.List;
 public class EmployeeService {
 
     private final UserRepository userRepository;
+    private final ProjectRepository projectRepository;
+    private final TaskRepository taskRepository;
 
     public Page<User> getAllEmployees(int page, int size, Role roleFilter, String sortBy, String direction) {
         List<User> users = getApprovedDirectoryUsers();
@@ -73,34 +75,32 @@ public class EmployeeService {
                 .orElseThrow(() -> new BadRequestException("User not found"));
     }
 
-    public User update(Long id, UpdateUserRequest request) {
+    public void delete(Long id) {
         User user = getById(id);
 
-        String role = SecurityContextHolder.getContext()
-                .getAuthentication()
-                .getAuthorities()
-                .toString();
-
-        if (role.contains("ROLE_EMPLOYEE")) {
-            user.setEmail(request.getEmail());
-            user.setContactNumber(request.getContactNumber());
-            user.setDob(request.getDob());
-        } else if (role.contains("ROLE_MANAGER")) {
-            user.setLocation(request.getLocation());
-        } else if (role.contains("ROLE_ADMIN")) {
-            user.setFirstName(request.getFirstName());
-            user.setLastName(request.getLastName());
-            user.setEmail(request.getEmail());
-            user.setContactNumber(request.getContactNumber());
-            user.setLocation(request.getLocation());
-            user.setDob(request.getDob());
+        if (user.getRole() == Role.ADMIN) {
+            throw new BadRequestException("Admin users cannot be deleted");
         }
 
-        return userRepository.save(user);
-    }
+        if (user.getRole() == Role.MANAGER) {
+            if (!userRepository.findByManagerIdAndRole(user.getId(), Role.EMPLOYEE).isEmpty()) {
+                throw new BadRequestException("Reassign team members before deleting this manager");
+            }
 
-    public void delete(Long id) {
-        userRepository.deleteById(id);
+            if (!projectRepository.findByManagerId(user.getId()).isEmpty()) {
+                throw new BadRequestException("Reassign or delete manager projects before deleting this manager");
+            }
+
+            if (!taskRepository.findByManagerId(user.getId()).isEmpty()) {
+                throw new BadRequestException("Delete manager tasks before deleting this manager");
+            }
+        }
+
+        if (user.getRole() == Role.EMPLOYEE && !taskRepository.findByEmployeeId(user.getId()).isEmpty()) {
+            throw new BadRequestException("Delete or reassign employee tasks before deleting this employee");
+        }
+
+        userRepository.delete(user);
     }
 
     public UserResponse mapToDto(User user) {

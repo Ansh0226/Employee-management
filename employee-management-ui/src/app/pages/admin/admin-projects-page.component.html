@@ -58,7 +58,7 @@
 </app-dashboard-layout>
 
 @if (selectedProject(); as project) {
-  <app-project-detail-modal [project]="project" (close)="closeProject()" />
+  <app-project-detail-modal [project]="project" [allowDelete]="true" (delete)="deleteProject($event)" (close)="closeProject()" />
 }
 
 @if (createModalOpen()) {
@@ -83,6 +83,43 @@
       </label>
 
       <button type="button" class="primary-button" (click)="createProject()">Create project</button>
+    </section>
+  </div>
+}
+
+@if (deleteErrorMessage()) {
+  <div class="modal-backdrop confirm-backdrop" (click)="closeDeleteErrorModal()">
+    <section class="modal-card confirm-modal" (click)="$event.stopPropagation()">
+      <div class="card-head">
+        <div>
+          <p class="eyebrow">Delete blocked</p>
+          <h2>Dependency found</h2>
+        </div>
+        <button type="button" class="ghost-button" (click)="closeDeleteErrorModal()">Close</button>
+      </div>
+
+      <p class="confirm-copy">{{ deleteErrorMessage() }}</p>
+    </section>
+  </div>
+}
+
+@if (pendingDeleteProjectId()) {
+  <div class="modal-backdrop confirm-backdrop" (click)="closeDeleteConfirmModal()">
+    <section class="modal-card confirm-modal" (click)="$event.stopPropagation()">
+      <div class="card-head">
+        <div>
+          <p class="eyebrow">Confirm delete</p>
+          <h2>Delete project?</h2>
+        </div>
+        <button type="button" class="ghost-button" (click)="closeDeleteConfirmModal()">Close</button>
+      </div>
+
+      <p class="confirm-copy">Delete this project? This action is allowed only when all project tasks are approved.</p>
+
+      <div class="confirm-actions">
+        <button type="button" class="ghost-button" (click)="closeDeleteConfirmModal()">Cancel</button>
+        <button type="button" class="primary-button danger-fill" (click)="confirmDeleteProject()">Delete project</button>
+      </div>
     </section>
   </div>
 }

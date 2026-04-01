@@ -28,6 +28,9 @@ export class DirectoryWorkspaceComponent {
   protected readonly imagePreviewOpen = signal(false);
   protected readonly selectedProjects = signal<ProjectRecord[]>([]);
   protected readonly selectedProjectDetail = signal<ProjectDetailRecord | null>(null);
+  protected readonly deleteErrorMessage = signal('');
+  protected readonly pendingDeleteUserId = signal<number | null>(null);
+  protected readonly pendingDeleteProjectId = signal<number | null>(null);
   protected readonly roles: Role[] = ['MANAGER', 'EMPLOYEE'];
 
   constructor() {
@@ -66,5 +69,73 @@ export class DirectoryWorkspaceComponent {
 
   protected closeProjectModal(): void {
     this.selectedProjectDetail.set(null);
+  }
+
+  protected deleteSelectedUser(): void {
+    const user = this.store().selectedUser();
+
+    if (!user) {
+      return;
+    }
+
+    this.pendingDeleteUserId.set(user.id);
+  }
+
+  protected confirmDeleteSelectedUser(): void {
+    const user = this.store().selectedUser();
+
+    if (!user) {
+      this.pendingDeleteUserId.set(null);
+      return;
+    }
+
+    this.pendingDeleteUserId.set(null);
+
+    this.workflow.deleteUser(user.id).subscribe({
+      next: (response) => {
+        this.store().notice.set(response.message);
+        this.store().noticeTone.set('success');
+        this.store().selectedUser.set(null);
+        this.store().refresh();
+      },
+      error: (error) => {
+        this.deleteErrorMessage.set(error?.error?.message || 'Unable to delete user.');
+      }
+    });
+  }
+
+  protected deleteProject(projectId: number): void {
+    this.pendingDeleteProjectId.set(projectId);
+  }
+
+  protected confirmDeleteProject(): void {
+    const projectId = this.pendingDeleteProjectId();
+
+    if (!projectId) {
+      return;
+    }
+
+    this.pendingDeleteProjectId.set(null);
+
+    this.workflow.deleteProject(projectId).subscribe({
+      next: (response) => {
+        this.store().notice.set(response.message);
+        this.store().noticeTone.set('success');
+        this.selectedProjectDetail.set(null);
+        this.selectedProjects.update((projects) => projects.filter((project) => project.id !== projectId));
+      },
+      error: (error) => {
+        this.deleteErrorMessage.set(error?.error?.message || 'Unable to delete project.');
+      }
+    });
+  }
+
+  protected closeDeleteErrorModal(): void {
+    this.deleteErrorMessage.set('');
+  }
+
+  protected closeDeleteConfirmModal(): void {
+    this.pendingDeleteUserId.set(null);
+    this.pendingDeleteProjectId.set(null);
   }
 }

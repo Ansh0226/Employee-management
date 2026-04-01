@@ -83,6 +83,15 @@ textarea {
   background: var(--card);
   color: var(--text);
 }
+
+.danger-outline {
+  border-color: rgba(220, 38, 38, 0.45);
+  color: #f87171;
+}
+
+.danger-fill {
+  background: #dc2626;
+}
 .list-item,
 .approval-item,
 .notice,

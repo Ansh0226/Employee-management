@@ -33,6 +33,12 @@
   gap: 12px;
 }
 
+.modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .eyebrow,
 h2,
 h3,
@@ -126,6 +132,17 @@ small,
   cursor: pointer;
 }
 
+.danger-button {
+  border: 0;
+  border-radius: 12px;
+  padding: 10px 14px;
+  background: #dc2626;
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 @media (max-width: 720px) {
   .modal-backdrop {
     padding: 12px;
@@ -136,6 +153,11 @@ small,
   }
 
   .modal-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .modal-actions {
     flex-direction: column;
     align-items: stretch;
   }

@@ -201,6 +201,11 @@ input::placeholder {
   color: var(--text);
 }
 
+.danger-outline {
+  border-color: rgba(220, 38, 38, 0.45);
+  color: #f87171;
+}
+
 .primary-button:disabled,
 .ghost-button:disabled {
   cursor: not-allowed;
@@ -428,11 +433,15 @@ input::placeholder {
 .detail-modal-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 30;
+  z-index: 40;
   display: grid;
   place-items: center;
   padding: 24px;
   background: rgba(10, 15, 25, 0.68);
+}
+
+.confirm-backdrop {
+  z-index: 50;
 }
 
 .detail-modal-card {
@@ -449,6 +458,28 @@ input::placeholder {
 .modal-card {
   background: transparent;
   border-color: var(--border);
+}
+
+.confirm-modal {
+  width: min(520px, 100%);
+  display: grid;
+  gap: 14px;
+}
+
+.confirm-copy {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.danger-fill {
+  background: #dc2626;
 }
 
 @media (max-width: 1280px) {

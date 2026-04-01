@@ -98,9 +98,36 @@
         <p>{{ task.description || 'No description added for this task.' }}</p>
       </section>
 
+      @if (task.status !== 'APPROVED') {
+        <button type="button" class="ghost-button danger-outline" (click)="deleteTask(task.id)">Delete task</button>
+      }
+
       @if (task.status === 'COMPLETED') {
         <button type="button" class="primary-button" (click)="approveTask(task.id); closeTaskModal()">Approve task</button>
       }
+    </section>
+  </div>
+}
+
+@if (pendingDeleteTaskId()) {
+  <div class="modal-backdrop" (click)="closeDeleteConfirmModal()">
+    <section class="modal-card" (click)="$event.stopPropagation()">
+      <div class="card-head">
+        <div>
+          <p class="eyebrow">Confirm delete</p>
+          <h2>Delete task?</h2>
+        </div>
+        <button type="button" class="ghost-button" (click)="closeDeleteConfirmModal()">Close</button>
+      </div>
+
+      <section class="task-detail-card">
+        <p>Delete this task? Approved tasks cannot be deleted.</p>
+      </section>
+
+      <div class="task-meta">
+        <button type="button" class="ghost-button" (click)="closeDeleteConfirmModal()">Cancel</button>
+        <button type="button" class="primary-button danger-fill" (click)="confirmDeleteTask()">Delete task</button>
+      </div>
     </section>
   </div>
 }

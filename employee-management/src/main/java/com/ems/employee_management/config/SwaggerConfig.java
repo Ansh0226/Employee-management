@@ -15,7 +15,10 @@ public class SwaggerConfig {
         final String securitySchemeName = "bearerAuth";
 
         return new OpenAPI()
-                .info(new Info().title("Employee Management API").version("1.0"))
+                .info(new Info()
+                        .title("EMS API")
+                        .version("1.0")
+                        .description("Short use text added for each API"))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(new Components()
                         .addSecuritySchemes(securitySchemeName,

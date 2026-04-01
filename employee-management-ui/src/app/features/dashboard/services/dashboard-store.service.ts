@@ -150,35 +150,6 @@ export class DashboardStoreService {
       });
   }
 
-  changeRole(): void {
-    const user = this.selectedUser();
-
-    if (!user) {
-      return;
-    }
-
-    const nextRole = this.roleDrafts()[user.id] ?? user.role;
-    this.adminBusy.set(true);
-
-    this.http
-      .put<ApiResponse<UserRecord>>(
-        `${this.apiBase}/admin/change-role/${user.id}?role=${nextRole}`,
-        {},
-        { headers: this.authHeaders() }
-      )
-      .subscribe({
-        next: (response) => {
-          this.showNotice(response.message, 'success');
-          this.refresh();
-          this.adminBusy.set(false);
-        },
-        error: (error) => {
-          this.showNotice(this.auth.getErrorMessage(error), 'error');
-          this.adminBusy.set(false);
-        }
-      });
-  }
-
   saveAdminUser(): void {
     const user = this.selectedUser();
 

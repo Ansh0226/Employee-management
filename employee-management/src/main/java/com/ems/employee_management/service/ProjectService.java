@@ -10,6 +10,7 @@ import com.ems.employee_management.entity.Task;
 import com.ems.employee_management.entity.User;
 import com.ems.employee_management.entity.enums.ProjectStatus;
 import com.ems.employee_management.entity.enums.Role;
+import com.ems.employee_management.entity.enums.TaskStatus;
 import com.ems.employee_management.exception.BadRequestException;
 import com.ems.employee_management.repository.ProjectRepository;
 import com.ems.employee_management.repository.TaskRepository;
@@ -100,6 +101,24 @@ public class ProjectService {
     public Project getProject(Long id) {
         return projectRepository.findById(id)
                 .orElseThrow(() -> new BadRequestException("Project not found"));
+    }
+
+    public void deleteProject(Long projectId) {
+        Project project = getProject(projectId);
+        List<Task> projectTasks = taskRepository.findByProjectId(projectId);
+
+        boolean hasPendingTask = projectTasks.stream()
+                .anyMatch(task -> task.getStatus() != TaskStatus.APPROVED);
+
+        if (hasPendingTask) {
+            throw new BadRequestException("Only projects with fully approved tasks can be deleted");
+        }
+
+        if (!projectTasks.isEmpty()) {
+            taskRepository.deleteAll(projectTasks);
+        }
+
+        projectRepository.delete(project);
     }
 
     public ProjectResponse toResponse(Project project) {

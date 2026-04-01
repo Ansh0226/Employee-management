@@ -3,13 +3,14 @@ package com.ems.employee_management.controller;
 import com.ems.employee_management.dto.ApiResponse;
 import com.ems.employee_management.dto.ChangePasswordRequest;
 import com.ems.employee_management.dto.UpdateProfileContactRequest;
-import com.ems.employee_management.dto.UpdateUserRequest;
 import com.ems.employee_management.dto.UpdateProfileImageRequest;
 import com.ems.employee_management.dto.UserResponse;
 import com.ems.employee_management.entity.User;
 import com.ems.employee_management.entity.enums.Role;
 import com.ems.employee_management.service.EmployeeService;
 import com.ems.employee_management.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,13 +19,14 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/employee")
 @RequiredArgsConstructor
+@Tag(name = "Employee", description = "Employee directory and profile")
 public class EmployeeController {
 
     private final EmployeeService employeeService;
     private final UserService userService;
 
-    // ✅ Get all (pagination + sorting)
     @GetMapping
+    @Operation(summary = "Directory", description = "List approved users")
     public ApiResponse<Page<UserResponse>> getAll(
             @RequestParam int page,
             @RequestParam int size,
@@ -43,8 +45,8 @@ public class EmployeeController {
                 .build();
     }
 
-    // ✅ Search (multi-field)
     @GetMapping("/search")
+    @Operation(summary = "Search users", description = "Search directory users")
     public ApiResponse<Page<UserResponse>> search(
             @RequestParam String keyword,
             @RequestParam int page,
@@ -62,8 +64,8 @@ public class EmployeeController {
                 .build();
     }
 
-    // ✅ Filter by location
     @GetMapping("/filter/location")
+    @Operation(summary = "Filter location", description = "Filter by location")
     public ApiResponse<Page<UserResponse>> filterByLocation(
             @RequestParam String location,
             @RequestParam int page,
@@ -81,8 +83,8 @@ public class EmployeeController {
                 .build();
     }
 
-    // ✅ Filter by age range (DOB based)
     @GetMapping("/filter/age-range")
+    @Operation(summary = "Filter age", description = "Filter by age range")
     public ApiResponse<Page<UserResponse>> filterByAgeRange(
             @RequestParam int minAge,
             @RequestParam int maxAge,
@@ -101,37 +103,8 @@ public class EmployeeController {
                 .build();
     }
 
-    // ✅ Get by ID
-    @GetMapping("/{id}")
-    public ApiResponse<UserResponse> getById(@PathVariable Long id) {
-
-        UserResponse user = employeeService.mapToDto(
-                employeeService.getById(id));
-
-        return ApiResponse.<UserResponse>builder()
-                .success(true)
-                .message("User fetched successfully")
-                .data(user)
-                .build();
-    }
-
-    // ✅ Update (role-based logic inside service)
-    @PutMapping("/{id}")
-    public ApiResponse<UserResponse> update(
-            @PathVariable Long id,
-            @Valid @RequestBody UpdateUserRequest request) {
-
-        UserResponse updatedUser = employeeService.mapToDto(
-                employeeService.update(id, request));
-
-        return ApiResponse.<UserResponse>builder()
-                .success(true)
-                .message("User updated successfully")
-                .data(updatedUser)
-                .build();
-    }
-
     @GetMapping("/profile")
+    @Operation(summary = "My profile", description = "Show current profile")
     public ApiResponse<UserResponse> profile() {
         User currentUser = userService.getCurrentUser();
 
@@ -143,6 +116,7 @@ public class EmployeeController {
     }
 
     @PutMapping("/change-password")
+    @Operation(summary = "Change password", description = "Update own password")
     public ApiResponse<String> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
         userService.changePassword(request);
 
@@ -154,6 +128,7 @@ public class EmployeeController {
     }
 
     @PutMapping("/profile-image")
+    @Operation(summary = "Update image", description = "Update profile image")
     public ApiResponse<UserResponse> updateProfileImage(@RequestBody UpdateProfileImageRequest request) {
         User updatedUser = userService.updateProfileImage(request);
 
@@ -165,6 +140,7 @@ public class EmployeeController {
     }
 
     @PutMapping("/profile-contact")
+    @Operation(summary = "Update contact", description = "Update contact number")
     public ApiResponse<UserResponse> updateProfileContact(@Valid @RequestBody UpdateProfileContactRequest request) {
         User updatedUser = userService.updateProfileContact(request);
 
@@ -175,10 +151,9 @@ public class EmployeeController {
                 .build();
     }
 
-    // ✅ Delete (only ADMIN allowed via SecurityConfig)
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete user", description = "Delete employee or manager")
     public ApiResponse<String> delete(@PathVariable Long id) {
-
         employeeService.delete(id);
 
         return ApiResponse.<String>builder()

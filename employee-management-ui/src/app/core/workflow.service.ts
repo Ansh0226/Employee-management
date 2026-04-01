@@ -69,6 +69,10 @@ export class WorkflowService {
     return this.http.get<ApiResponse<ProjectDetailRecord>>(`${this.apiBase}/projects/${projectId}/detail`, { headers: this.authHeaders() });
   }
 
+  deleteProject(projectId: number) {
+    return this.http.delete<ApiResponse<string>>(`${this.apiBase}/projects/${projectId}`, { headers: this.authHeaders() });
+  }
+
   createTask(payload: CreateTaskRequest) {
     return this.http.post<ApiResponse<TaskRecord>>(`${this.apiBase}/tasks`, payload, { headers: this.authHeaders() });
   }
@@ -81,12 +85,16 @@ export class WorkflowService {
     return this.http.get<ApiResponse<TaskRecord[]>>(`${this.apiBase}/tasks/employee`, { headers: this.authHeaders() });
   }
 
-  getPendingTaskApprovals() {
-    return this.http.get<ApiResponse<TaskRecord[]>>(`${this.apiBase}/tasks/pending-approvals`, { headers: this.authHeaders() });
-  }
-
   approveTask(taskId: number) {
     return this.http.put<ApiResponse<TaskRecord>>(`${this.apiBase}/tasks/manager/${taskId}/approve`, {}, { headers: this.authHeaders() });
+  }
+
+  deleteTask(taskId: number) {
+    return this.http.delete<ApiResponse<string>>(`${this.apiBase}/tasks/manager/${taskId}`, { headers: this.authHeaders() });
+  }
+
+  deleteUser(userId: number) {
+    return this.http.delete<ApiResponse<string>>(`${this.apiBase}/employee/${userId}`, { headers: this.authHeaders() });
   }
 
   updateEmployeeLocation(userId: number, location: string) {

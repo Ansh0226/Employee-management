@@ -20,6 +20,7 @@ export class ManagerTasksPageComponent {
   protected readonly tasks = signal<TaskRecord[]>([]);
   protected readonly createModalOpen = signal(false);
   protected readonly selectedTask = signal<TaskRecord | null>(null);
+  protected readonly pendingDeleteTaskId = signal<number | null>(null);
   protected readonly taskFilter = signal<'PENDING' | 'WAITING' | 'COMPLETED'>('PENDING');
   protected readonly notice = signal('');
   protected readonly noticeTone = signal<'success' | 'error'>('success');
@@ -94,5 +95,36 @@ export class ManagerTasksPageComponent {
         this.noticeTone.set('error');
       }
     });
+  }
+
+  protected deleteTask(taskId: number): void {
+    this.pendingDeleteTaskId.set(taskId);
+  }
+
+  protected confirmDeleteTask(): void {
+    const taskId = this.pendingDeleteTaskId();
+
+    if (!taskId) {
+      return;
+    }
+
+    this.pendingDeleteTaskId.set(null);
+
+    this.workflow.deleteTask(taskId).subscribe({
+      next: (response) => {
+        this.notice.set(response.message);
+        this.noticeTone.set('success');
+        this.selectedTask.set(null);
+        this.refresh();
+      },
+      error: () => {
+        this.notice.set('Unable to delete task.');
+        this.noticeTone.set('error');
+      }
+    });
+  }
+
+  protected closeDeleteConfirmModal(): void {
+    this.pendingDeleteTaskId.set(null);
   }
 }

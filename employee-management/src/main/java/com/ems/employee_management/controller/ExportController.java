@@ -3,6 +3,8 @@ package com.ems.employee_management.controller;
 import com.ems.employee_management.entity.enums.Role;
 import com.ems.employee_management.service.DirectoryExportService;
 import com.itextpdf.text.DocumentException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -17,11 +19,13 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/exports")
 @RequiredArgsConstructor
+@Tag(name = "Export", description = "Directory exports")
 public class ExportController {
 
     private final DirectoryExportService directoryExportService;
 
     @GetMapping("/excel")
+    @Operation(summary = "Export Excel", description = "Download directory excel")
     public ResponseEntity<byte[]> exportExcel(
             @RequestParam Role viewRole,
             @RequestParam(required = false) String keyword,
@@ -40,6 +44,7 @@ public class ExportController {
     }
 
     @GetMapping("/pdf")
+    @Operation(summary = "Export PDF", description = "Download directory pdf")
     public ResponseEntity<byte[]> exportPdf(
             @RequestParam Role viewRole,
             @RequestParam(required = false) String keyword,
