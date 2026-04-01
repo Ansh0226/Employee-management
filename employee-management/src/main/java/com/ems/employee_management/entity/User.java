@@ -5,6 +5,7 @@ import java.time.Period;
 
 import com.ems.employee_management.entity.enums.Role;
 import com.ems.employee_management.entity.enums.Status;
+import com.ems.employee_management.util.LocalDateStringConverter;
 import com.ems.employee_management.validation.Adult;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -55,6 +56,7 @@ public class User {
     @NotNull
     @Past(message = "DOB must be in the past")
     @Adult
+    @Convert(converter = LocalDateStringConverter.class)
     private LocalDate dob;
 
     // ✅ Contact Number (INDIA friendly validation)
